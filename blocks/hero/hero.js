@@ -181,49 +181,52 @@ export default async function decorate(block) {
       }
     } else if (index === 1) {
       // Second row: Description - "Two planetary-scale systems. One inevitable convergence."
-      // Try multiple ways to find the description text
+      // Extract description text, EXCLUDING any link/button text
       let descText = '';
       let descElement = null;
       
-      // Get all text content from the row, excluding links
-      const rowText = row.textContent.trim();
-      const hasLinks = row.querySelectorAll('a').length > 0;
+      // Clone the row to safely remove links without affecting original
+      const tempRow = row.cloneNode(true);
+      // Remove all links from the clone
+      tempRow.querySelectorAll('a').forEach(link => link.remove());
+      // Get text content after removing links
+      descText = tempRow.textContent.trim();
       
-      // Method 1: Check if content is a <p> tag
-      if (content.tagName === 'P') {
+      // Method 1: Check if content is a <p> tag (and doesn't contain links)
+      if (content.tagName === 'P' && !content.querySelector('a')) {
         descElement = content;
+        // Use textContent which excludes link text
         descText = content.textContent.trim();
       }
-      // Method 2: Look for <p> inside content
-      else if (content.querySelector('p')) {
-        descElement = content.querySelector('p');
+      // Method 2: Look for <p> inside content that doesn't contain links
+      else if (content.querySelector('p:not(:has(a))')) {
+        descElement = content.querySelector('p:not(:has(a))');
         descText = descElement.textContent.trim();
       }
-      // Method 3: Extract text from row, excluding link text
-      else {
-        // Get text content, but exclude link text
-        const tempDiv = row.cloneNode(true);
-        tempDiv.querySelectorAll('a').forEach(link => link.remove());
-        descText = tempDiv.textContent.trim();
-        
-        // Also check if content itself has text
-        if (!descText && content.textContent.trim()) {
-          descText = content.textContent.trim();
-        }
+      // Method 3: Use the cloned row text (already has links removed)
+      else if (descText) {
+        // descText already set from cloned row above
       }
       
-      // Filter out button text and links
-      const buttonTexts = ['The Thesis', 'How It Works', 'Run a Validator'];
-      const isButtonText = buttonTexts.some(btn => descText === btn || descText.includes(btn));
+      // Clean up: remove any button text that might have been included
+      // Get all link texts to exclude them
+      const linkTexts = Array.from(row.querySelectorAll('a')).map(link => link.textContent.trim());
+      linkTexts.forEach(linkText => {
+        // Remove the link text from description if present
+        descText = descText.replace(new RegExp(linkText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '').trim();
+      });
       
-      // Only add description if we found valid text
-      if (descText && descText.length > 0 && !isButtonText && !descText.match(/^https?:\/\//)) {
-        if (descElement && descElement.tagName === 'P') {
-          // Use existing <p> element
+      // Clean up extra whitespace
+      descText = descText.replace(/\s+/g, ' ').trim();
+      
+      // Only add description if we found valid text (not empty, not just button text)
+      if (descText && descText.length > 0 && descText.length > 10) {
+        if (descElement && descElement.tagName === 'P' && !descElement.querySelector('a')) {
+          // Use existing <p> element (no links)
           descElement.className = 'hero-description';
           heroContent.appendChild(descElement);
         } else {
-          // Create new <p> element
+          // Create new <p> element with cleaned text
           const descEl = document.createElement('p');
           descEl.className = 'hero-description';
           descEl.textContent = descText;
@@ -232,7 +235,7 @@ export default async function decorate(block) {
         console.log('Hero block - Description added:', descText);
         descriptionFound = true;
       } else {
-        console.warn('Hero block - No description found in row', index, 'Row text:', rowText, 'Content text:', content.textContent.trim());
+        console.warn('Hero block - No description found in row', index, 'Cleaned text:', descText);
       }
     } else {
       // Remaining rows: Links that will become buttons
@@ -252,14 +255,27 @@ export default async function decorate(block) {
   if (!descriptionFound) {
     console.log('Hero block - Description not found at index 1, searching all rows...');
     rows.forEach((row, index) => {
-      const rowText = row.textContent.trim();
+      // Clone row and remove links to get clean text
+      const tempRow = row.cloneNode(true);
+      tempRow.querySelectorAll('a').forEach(link => link.remove());
+      const rowText = tempRow.textContent.trim();
+      
       // Look for description text pattern
       if (rowText && (rowText.includes('planetary') || rowText.includes('convergence') || rowText.includes('systems'))) {
-        // Make sure it's not button text
-        if (!rowText.match(/^(The Thesis|How It Works|Run a Validator)$/i)) {
+        // Get link texts to exclude
+        const linkTexts = Array.from(row.querySelectorAll('a')).map(link => link.textContent.trim());
+        let cleanText = rowText;
+        // Remove link texts
+        linkTexts.forEach(linkText => {
+          cleanText = cleanText.replace(new RegExp(linkText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '').trim();
+        });
+        cleanText = cleanText.replace(/\s+/g, ' ').trim();
+        
+        // Only add if we have meaningful text left
+        if (cleanText && cleanText.length > 10) {
           const descEl = document.createElement('p');
           descEl.className = 'hero-description';
-          descEl.textContent = rowText;
+          descEl.textContent = cleanText;
           // Insert after title wrapper
           const titleWrapper = heroContent.querySelector('.hero-title-wrapper');
           if (titleWrapper) {
@@ -268,7 +284,7 @@ export default async function decorate(block) {
             heroContent.insertBefore(descEl, heroContent.querySelector('.hero-buttons') || heroContent.firstChild);
           }
           descriptionFound = true;
-          console.log('Hero block - Description found in row', index, ':', rowText);
+          console.log('Hero block - Description found in row', index, ':', cleanText);
         }
       }
     });
