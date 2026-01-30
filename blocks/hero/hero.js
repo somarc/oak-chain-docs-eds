@@ -50,13 +50,29 @@ export default async function decorate(block) {
   // Debug: log row structure
   console.log('Hero block - Rows found:', rows.length);
   rows.forEach((row, index) => {
-    console.log(`Row ${index}:`, row.innerHTML.substring(0, 100));
+    console.log(`Row ${index}:`, row.innerHTML.substring(0, 200), 'Text:', row.textContent.trim().substring(0, 100));
   });
+  
+  // Track if description was found
+  let descriptionFound = false;
   
   // Process rows
   rows.forEach((row, index) => {
     const content = row.firstElementChild;
-    if (!content) return;
+    if (!content) {
+      // If no firstElementChild, check if row itself has text content
+      const rowText = row.textContent.trim();
+      // Check if this looks like the description (contains "planetary" or "convergence")
+      if (rowText && (rowText.includes('planetary') || rowText.includes('convergence') || rowText.includes('systems'))) {
+        const descEl = document.createElement('p');
+        descEl.className = 'hero-description';
+        descEl.textContent = rowText;
+        heroContent.appendChild(descEl);
+        descriptionFound = true;
+        console.log('Hero block - Description found in empty row:', rowText);
+      }
+      return;
+    }
     
     if (index === 0) {
       // First row: Title - split "Oak Chain" and "When Ethereum Meets Oak"
@@ -164,16 +180,59 @@ export default async function decorate(block) {
         }
       }
     } else if (index === 1) {
-      // Second row: Description
-      const desc = content.querySelector('p') || (content.tagName === 'P' ? content : null);
-      if (desc) {
-        desc.className = 'hero-description';
-        heroContent.appendChild(desc);
+      // Second row: Description - "Two planetary-scale systems. One inevitable convergence."
+      // Try multiple ways to find the description text
+      let descText = '';
+      let descElement = null;
+      
+      // Get all text content from the row, excluding links
+      const rowText = row.textContent.trim();
+      const hasLinks = row.querySelectorAll('a').length > 0;
+      
+      // Method 1: Check if content is a <p> tag
+      if (content.tagName === 'P') {
+        descElement = content;
+        descText = content.textContent.trim();
+      }
+      // Method 2: Look for <p> inside content
+      else if (content.querySelector('p')) {
+        descElement = content.querySelector('p');
+        descText = descElement.textContent.trim();
+      }
+      // Method 3: Extract text from row, excluding link text
+      else {
+        // Get text content, but exclude link text
+        const tempDiv = row.cloneNode(true);
+        tempDiv.querySelectorAll('a').forEach(link => link.remove());
+        descText = tempDiv.textContent.trim();
+        
+        // Also check if content itself has text
+        if (!descText && content.textContent.trim()) {
+          descText = content.textContent.trim();
+        }
+      }
+      
+      // Filter out button text and links
+      const buttonTexts = ['The Thesis', 'How It Works', 'Run a Validator'];
+      const isButtonText = buttonTexts.some(btn => descText === btn || descText.includes(btn));
+      
+      // Only add description if we found valid text
+      if (descText && descText.length > 0 && !isButtonText && !descText.match(/^https?:\/\//)) {
+        if (descElement && descElement.tagName === 'P') {
+          // Use existing <p> element
+          descElement.className = 'hero-description';
+          heroContent.appendChild(descElement);
+        } else {
+          // Create new <p> element
+          const descEl = document.createElement('p');
+          descEl.className = 'hero-description';
+          descEl.textContent = descText;
+          heroContent.appendChild(descEl);
+        }
+        console.log('Hero block - Description added:', descText);
+        descriptionFound = true;
       } else {
-        const descEl = document.createElement('p');
-        descEl.className = 'hero-description';
-        descEl.textContent = content.textContent.trim();
-        heroContent.appendChild(descEl);
+        console.warn('Hero block - No description found in row', index, 'Row text:', rowText, 'Content text:', content.textContent.trim());
       }
     } else {
       // Remaining rows: Links that will become buttons
@@ -188,6 +247,32 @@ export default async function decorate(block) {
   // Clear block and add new structure
   block.textContent = '';
   block.appendChild(heroWrapper);
+  
+  // Fallback: If description wasn't found, search all original rows for it
+  if (!descriptionFound) {
+    console.log('Hero block - Description not found at index 1, searching all rows...');
+    rows.forEach((row, index) => {
+      const rowText = row.textContent.trim();
+      // Look for description text pattern
+      if (rowText && (rowText.includes('planetary') || rowText.includes('convergence') || rowText.includes('systems'))) {
+        // Make sure it's not button text
+        if (!rowText.match(/^(The Thesis|How It Works|Run a Validator)$/i)) {
+          const descEl = document.createElement('p');
+          descEl.className = 'hero-description';
+          descEl.textContent = rowText;
+          // Insert after title wrapper
+          const titleWrapper = heroContent.querySelector('.hero-title-wrapper');
+          if (titleWrapper) {
+            titleWrapper.insertAdjacentElement('afterend', descEl);
+          } else {
+            heroContent.insertBefore(descEl, heroContent.querySelector('.hero-buttons') || heroContent.firstChild);
+          }
+          descriptionFound = true;
+          console.log('Hero block - Description found in row', index, ':', rowText);
+        }
+      }
+    });
+  }
   
   // Now recreate buttons from collected links
   if (linksData.length > 0) {
