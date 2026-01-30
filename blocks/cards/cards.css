@@ -27,6 +27,47 @@
   border-color: var(--border-primary);
 }
 
+/* Clickable cards - entire card becomes a link */
+.cards.clickable > ul > li {
+  /* Maintain original padding and layout */
+  padding: 24px;
+  position: relative;
+}
+
+.cards.clickable .cards-card-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  text-decoration: none;
+  color: transparent;
+  /* Make link cover entire card but don't interfere with layout */
+}
+
+.cards.clickable .cards-card-link:hover,
+.cards.clickable .cards-card-link:focus {
+  text-decoration: none;
+  outline: none;
+}
+
+.cards.clickable .cards-card-link:focus {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: -2px;
+  border-radius: 12px;
+}
+
+.cards.clickable > ul > li:hover {
+  cursor: pointer;
+}
+
+/* Ensure card content is above the link overlay */
+.cards.clickable > ul > li > * {
+  position: relative;
+  z-index: 2;
+}
+
 /* Card image/icon */
 .cards .cards-card-image {
   line-height: 0;
@@ -84,6 +125,10 @@
     padding: 32px;
   }
   
+  .cards.clickable > ul > li {
+    padding: 32px; /* Maintain padding */
+  }
+  
   .cards .cards-card-image {
     width: 72px;
     height: 72px;
@@ -98,5 +143,9 @@
   
   .cards > ul > li {
     padding: 20px;
+  }
+  
+  .cards.clickable > ul > li {
+    padding: 20px; /* Maintain padding */
   }
 }

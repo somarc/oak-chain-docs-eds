@@ -208,13 +208,26 @@ export default async function decorate(block) {
         // descText already set from cloned row above
       }
       
-      // Clean up: remove any button text that might have been included
+      // Clean up: remove any button text and title text that might have been included
       // Get all link texts to exclude them
       const linkTexts = Array.from(row.querySelectorAll('a')).map(link => link.textContent.trim());
       linkTexts.forEach(linkText => {
         // Remove the link text from description if present
         descText = descText.replace(new RegExp(linkText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), '').trim();
       });
+      
+      // Remove title patterns if they appear in description
+      const titlePatterns = ['Oak Chain', 'When Ethereum Meets Oak', 'Oak Chain When Ethereum Meets Oak'];
+      titlePatterns.forEach(pattern => {
+        const regex = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        descText = descText.replace(regex, '').trim();
+      });
+      
+      // Extract just the description part (starting from "Two planetary-scale")
+      const descMatch = descText.match(/(Two\s+planetary-scale[^.]*\.\s*One\s+inevitable\s+convergence\.?)/i);
+      if (descMatch) {
+        descText = descMatch[1];
+      }
       
       // Clean up extra whitespace
       descText = descText.replace(/\s+/g, ' ').trim();
@@ -254,11 +267,32 @@ export default async function decorate(block) {
   // Fallback: If description wasn't found, search all original rows for it
   if (!descriptionFound) {
     console.log('Hero block - Description not found at index 1, searching all rows...');
+    
+    // Get the title text that we already extracted (to exclude it from description)
+    const extractedTitle = heroContent.querySelector('.hero-title')?.textContent.trim() || '';
+    const extractedSubtitle = heroContent.querySelector('.hero-subtitle')?.textContent.trim() || '';
+    const titlePatterns = [
+      extractedTitle,
+      extractedSubtitle,
+      'Oak Chain',
+      'When Ethereum Meets Oak',
+      'Oak Chain When Ethereum Meets Oak',
+    ].filter(Boolean);
+    
     rows.forEach((row, index) => {
       // Clone row and remove links to get clean text
       const tempRow = row.cloneNode(true);
       tempRow.querySelectorAll('a').forEach(link => link.remove());
-      const rowText = tempRow.textContent.trim();
+      let rowText = tempRow.textContent.trim();
+      
+      // Remove title text patterns from the row text
+      titlePatterns.forEach(titlePattern => {
+        if (titlePattern) {
+          // Remove title pattern (case insensitive, handle variations)
+          const regex = new RegExp(titlePattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+          rowText = rowText.replace(regex, '').trim();
+        }
+      });
       
       // Look for description text pattern
       if (rowText && (rowText.includes('planetary') || rowText.includes('convergence') || rowText.includes('systems'))) {
@@ -271,8 +305,14 @@ export default async function decorate(block) {
         });
         cleanText = cleanText.replace(/\s+/g, ' ').trim();
         
-        // Only add if we have meaningful text left
-        if (cleanText && cleanText.length > 10) {
+        // Extract just the description part (starting from "Two planetary-scale")
+        const descMatch = cleanText.match(/(Two\s+planetary-scale[^.]*\.\s*One\s+inevitable\s+convergence\.?)/i);
+        if (descMatch) {
+          cleanText = descMatch[1];
+        }
+        
+        // Only add if we have meaningful text left and it looks like the description
+        if (cleanText && cleanText.length > 10 && cleanText.includes('planetary')) {
           const descEl = document.createElement('p');
           descEl.className = 'hero-description';
           descEl.textContent = cleanText;
