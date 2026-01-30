@@ -5,33 +5,193 @@
 
 .hero {
   position: relative;
-  padding: 40px 24px;
-  min-height: 300px;
+  padding: 80px 24px;
+  min-height: 500px;
+  overflow: hidden;
+  /* Match site background color with subtle gradient overlay */
+  background-color: var(--background-color);
+  /* Add subtle radial glow from center-right for visual interest */
+  background-image: 
+    radial-gradient(ellipse at 70% 50%, rgba(147, 129, 255, 0.15) 0%, transparent 50%);
 }
 
-.hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: var(--background-color);
+/* Two-column layout wrapper */
+.hero .hero-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
-.hero picture {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  object-fit: cover;
-  box-sizing: border-box;
+/* Left column: text content */
+.hero .hero-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.5rem;
+  text-align: left;
 }
 
-.hero img {
-  object-fit: cover;
+/* Title wrapper */
+.hero .hero-title-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Main title "Oak Chain" - medium blue gradient */
+.hero .hero-title {
+  margin: 0;
+  font-size: 3.5rem;
+  font-weight: 700;
+  font-family: var(--heading-font-family);
+  line-height: 1.2;
+  /* Medium blue gradient matching reference */
+  background: linear-gradient(135deg, #627EEA 0%, #8C8DFC 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Subtitle "When Ethereum Meets Oak" - white, very large, stacked */
+.hero .hero-subtitle {
+  margin: 0;
+  font-size: 4.5rem;
+  font-weight: 700;
+  font-family: var(--heading-font-family);
+  color: #ffffff;
+  line-height: 1.1;
+  word-break: break-word;
+}
+
+/* Description */
+.hero .hero-description {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #ffffff;
+  line-height: 1.6;
+  max-width: 600px;
+  opacity: 0.95;
+  margin-top: 0.5rem;
+}
+
+/* Buttons container */
+.hero .hero-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+/* Right column: logo */
+.hero .hero-logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.hero .hero-logo img {
   width: 100%;
-  height: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain;
+  /* Enhanced glow effect matching reference */
+  filter: drop-shadow(0 0 40px rgba(147, 129, 255, 0.4)) drop-shadow(0 0 80px rgba(147, 129, 255, 0.2));
 }
 
 @media (width >= 900px) {
   .hero {
-    padding: 40px 32px;
+    padding: 120px 48px;
+    min-height: 650px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .hero .hero-wrapper {
+    grid-template-columns: 1.2fr 1fr;
+    gap: 4rem;
+    width: 100%;
+  }
+  
+  .hero .hero-title {
+    font-size: 3.5rem;
+  }
+  
+  .hero .hero-subtitle {
+    font-size: 4.5rem;
+    line-height: 1.05;
+  }
+  
+  .hero .hero-description {
+    font-size: 1.2rem;
+  }
+  
+  .hero .hero-buttons {
+    margin-top: 1.5rem;
+  }
+  
+  .hero .hero-logo {
+    position: relative;
+  }
+  
+  .hero .hero-logo img {
+    max-width: 500px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 899px) {
+  .hero {
+    padding: 60px 24px;
+    min-height: 400px;
+  }
+  
+  .hero .hero-wrapper {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .hero .hero-content {
+    align-items: center;
+    text-align: center;
+  }
+  
+  .hero .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero .hero-subtitle {
+    font-size: 3rem;
+  }
+  
+  .hero .hero-description {
+    font-size: 1rem;
+  }
+  
+  .hero .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .hero .hero-buttons .button {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .hero .hero-logo {
+    order: -1; /* Logo first on mobile */
+  }
+  
+  .hero .hero-logo img {
+    max-width: 250px;
   }
 }

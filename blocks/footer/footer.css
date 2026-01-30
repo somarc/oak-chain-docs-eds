@@ -1,6 +1,11 @@
 footer {
-  background-color: var(--light-color);
+  background-color: var(--bg-code);
+  border-top: 1px solid var(--border-divider);
   font-size: var(--body-font-size-xs);
+}
+
+footer .footer {
+  text-align: center;
 }
 
 footer .footer > div {
@@ -11,6 +16,7 @@ footer .footer > div {
 
 footer .footer p {
   margin: 0;
+  color: var(--text-secondary);
 }
 
 @media (width >= 900px) {

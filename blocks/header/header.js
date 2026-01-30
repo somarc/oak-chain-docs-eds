@@ -126,14 +126,91 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  if (navBrand) {
+    // Remove button classes from brand link
+    const brandLink = navBrand.querySelector('a');
+    if (brandLink) {
+      brandLink.classList.remove('button', 'primary', 'secondary', 'brand');
+      const buttonContainer = brandLink.closest('.button-container');
+      if (buttonContainer) {
+        buttonContainer.classList.remove('button-container');
+      }
+    }
   }
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
+    // Remove button classes from nav links (EDS auto-converts single links to buttons)
+    navSections.querySelectorAll('a.button').forEach((link) => {
+      link.classList.remove('button', 'primary', 'secondary', 'brand');
+      const buttonContainer = link.closest('.button-container');
+      if (buttonContainer) {
+        buttonContainer.classList.remove('button-container');
+      }
+    });
+
+    // Ensure list structure is correct - find the ul and ensure li items are properly separated
+    const navList = navSections.querySelector(':scope .default-content-wrapper > ul');
+    if (navList) {
+      // Get all links first
+      const allLinks = navList.querySelectorAll('a');
+      
+      // If we have links but they're not in separate li elements, restructure
+      if (allLinks.length > 0) {
+        // Check if links are direct children or in li elements
+        const directLinkChildren = Array.from(navList.children).filter(child => child.tagName === 'A');
+        
+        if (directLinkChildren.length > 0 || allLinks.length !== navList.querySelectorAll('li').length) {
+          // Restructure: create new ul with proper li structure
+          const newUl = document.createElement('ul');
+          allLinks.forEach((link) => {
+            const li = document.createElement('li');
+            // Clone the link to preserve attributes
+            const clonedLink = link.cloneNode(true);
+            li.appendChild(clonedLink);
+            newUl.appendChild(li);
+          });
+          
+          // Replace the old ul
+          navList.parentNode.replaceChild(newUl, navList);
+          newUl.classList.add(...navList.classList);
+        }
+      }
+
+      // Ensure each li contains exactly one link and has proper spacing
+      const finalList = navSections.querySelector(':scope .default-content-wrapper > ul') || newUl;
+      if (finalList) {
+        finalList.querySelectorAll('li').forEach((li) => {
+          const links = li.querySelectorAll('a');
+          if (links.length > 1) {
+            // If multiple links in one li, split them
+            links.forEach((link, linkIndex) => {
+              if (linkIndex > 0) {
+                const newLi = document.createElement('li');
+                newLi.appendChild(link);
+                li.parentNode.insertBefore(newLi, li.nextSibling);
+              }
+            });
+          }
+          
+          // Ensure link is block-level and properly styled
+          const link = li.querySelector('a');
+          if (link) {
+            link.style.display = 'block';
+            link.style.whiteSpace = 'nowrap';
+            link.style.margin = '0';
+            link.style.padding = '0.5em 0';
+          }
+          
+          // Ensure li has proper spacing
+          li.style.margin = '0';
+          li.style.padding = '0';
+          li.style.display = 'flex';
+          li.style.alignItems = 'center';
+        });
+      }
+    }
+
     navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
       navSection.addEventListener('click', () => {
@@ -158,6 +235,12 @@ export default async function decorate(block) {
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+
+  // Ensure nav sections are visible on desktop
+  if (isDesktop.matches && navSections) {
+    navSections.style.display = 'block';
+    navSections.style.visibility = 'visible';
+  }
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';

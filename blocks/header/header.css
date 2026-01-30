@@ -1,6 +1,8 @@
 /* header and nav layout */
 header .nav-wrapper {
-  background-color: var(--background-color);
+  background-color: rgba(15, 15, 35, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-divider);
   width: 100%;
   z-index: 2;
   position: fixed;
@@ -38,9 +40,16 @@ header nav[aria-expanded='true'] {
   header nav {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     gap: 0 32px;
     max-width: 1264px;
     padding: 0 32px;
+  }
+
+  /* Ensure nav sections are flex items */
+  header nav > section {
+    display: flex;
+    align-items: center;
   }
 
   header nav[aria-expanded='true'] {
@@ -55,7 +64,14 @@ header nav p {
 }
 
 header nav a:any-link {
-  color: currentcolor;
+  color: var(--text-color);
+  transition: color 0.2s ease;
+}
+
+/* Navigation link hover effects - Oak Chain purple */
+header nav .nav-sections a:hover {
+  color: var(--link-hover-color);
+  text-decoration: none;
 }
 
 /* hamburger */
@@ -146,11 +162,39 @@ header .nav-brand {
   font-size: var(--heading-font-size-s);
   font-weight: 700;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 header nav .nav-brand img {
-  width: 128px;
-  height: auto;
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
+header nav .nav-brand a {
+  color: var(--text-color);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+header nav .nav-brand a:hover {
+  color: var(--text-color);
+  text-decoration: none;
+}
+
+/* Remove button styling from brand link if present */
+header nav .nav-brand a.button,
+header nav .nav-brand .button-container {
+  display: flex;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 /* sections */
@@ -170,11 +214,68 @@ header nav[aria-expanded='true'] .nav-sections {
 header nav .nav-sections ul {
   list-style: none;
   padding-left: 0;
+  margin: 0;
   font-size: var(--body-font-size-s);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
 }
 
 header nav .nav-sections ul > li {
   font-weight: 500;
+  display: block;
+  margin: 0;
+  padding: 0;
+}
+
+/* Prevent nav links from being styled as buttons */
+header nav .nav-sections a.button,
+header nav .nav-sections .button-container {
+  display: inline;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  text-decoration: none;
+}
+
+header nav .nav-sections a.button:hover,
+header nav .nav-sections a.button:focus {
+  background: none;
+  border: none;
+  box-shadow: none;
+  transform: none;
+}
+
+header nav .nav-sections a {
+  color: var(--text-color) !important;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  display: inline-block;
+  font-weight: 500;
+}
+
+header nav .nav-sections a:hover,
+header nav .nav-sections a:focus {
+  color: var(--link-hover-color) !important;
+  text-decoration: none;
+}
+
+/* Ensure nav links are visible and properly styled */
+header nav .nav-sections .default-content-wrapper ul li {
+  display: list-item !important;  /* Ensure it's a list item */
+  padding: 0 !important;
+}
+
+header nav .nav-sections .default-content-wrapper ul li a {
+  color: var(--text-color) !important;
+  background: none !important;
+  border: none !important;
+  padding: 0.5em 0 !important;
+  display: block !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
 }
 
 header nav .nav-sections ul > li > ul {
@@ -187,9 +288,17 @@ header nav .nav-sections ul > li > ul > li {
 
 @media (width >= 900px) {
   header nav .nav-sections {
-    display: block;
-    visibility: visible;
-    white-space: nowrap;
+    display: flex !important;
+    visibility: visible !important;
+    align-items: center;
+    flex: 1 1 auto;
+    min-width: 0; /* Allow flex item to shrink */
+  }
+
+  header nav .nav-sections .default-content-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
   }
 
   header nav[aria-expanded='true'] .nav-sections {
@@ -222,15 +331,62 @@ header nav .nav-sections ul > li > ul > li {
     transform: rotate(315deg);
   }
 
+  /* Force horizontal layout for navigation */
   header nav .nav-sections ul {
-    display: flex;
-    gap: 24px;
-    margin: 0;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 24px !important;  /* Use gap for spacing */
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center;
+    list-style: none !important;
+    width: 100%;
+  }
+
+  /* Ensure nav links display inline horizontally */
+  header nav .nav-sections .default-content-wrapper > ul {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 24px !important;  /* Use gap for spacing */
+    margin: 0 !important;
+    padding: 0 !important;
+    align-items: center;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li {
-    flex: 0 1 auto;
+    display: flex !important;
+    align-items: center;
+    list-style: none !important;
+    margin: 0 12px 0 0 !important;  /* Fallback spacing if gap doesn't work */
+    padding: 0 !important;
+    flex-shrink: 0;
+    white-space: nowrap;
     position: relative;
+    min-width: 0;  /* Allow flex item to shrink if needed */
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li:last-child {
+    margin-right: 0 !important;
+  }
+
+  /* Ensure links are separate elements */
+  header nav .nav-sections .default-content-wrapper > ul > li a {
+    display: block !important;
+    isolation: isolate;  /* Create new stacking context */
+  }
+
+  header nav .nav-sections .default-content-wrapper > ul > li a {
+    display: block !important;  /* Block to ensure proper spacing */
+    padding: 0.5em 0 !important;
+    margin: 0 !important;
+    color: var(--text-color) !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    font-weight: 500;
+    word-spacing: normal !important;
+    letter-spacing: normal !important;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul {
@@ -269,4 +425,15 @@ header nav .nav-sections ul > li > ul > li {
 /* tools */
 header nav .nav-tools {
   grid-area: tools;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (width >= 900px) {
+  header nav .nav-tools {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
 }
