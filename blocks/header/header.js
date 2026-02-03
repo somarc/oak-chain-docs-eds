@@ -75,7 +75,6 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
   nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
   toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
   button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
-  // enable nav dropdown keyboard accessibility
   const navDrops = navSections.querySelectorAll('.nav-drop');
   if (isDesktop.matches) {
     navDrops.forEach((drop) => {
@@ -91,11 +90,8 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
     });
   }
 
-  // enable menu collapse on escape keypress
   if (!expanded || isDesktop.matches) {
-    // collapse menu on escape press
     window.addEventListener('keydown', closeOnEscape);
-    // collapse menu on focus lost
     nav.addEventListener('focusout', closeOnFocusLost);
   } else {
     window.removeEventListener('keydown', closeOnEscape);
@@ -108,12 +104,10 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
   const fragment = await loadFragment(navPath);
 
-  // decorate nav DOM
   block.textContent = '';
   const nav = document.createElement('nav');
   nav.id = 'nav';
@@ -127,7 +121,6 @@ export default async function decorate(block) {
 
   const navBrand = nav.querySelector('.nav-brand');
   if (navBrand) {
-    // Remove button classes from brand link
     const brandLink = navBrand.querySelector('a');
     if (brandLink) {
       brandLink.classList.remove('button', 'primary', 'secondary', 'brand');
@@ -140,7 +133,6 @@ export default async function decorate(block) {
 
   const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
-    // Remove button classes from nav links (EDS auto-converts single links to buttons)
     navSections.querySelectorAll('a.button').forEach((link) => {
       link.classList.remove('button', 'primary', 'secondary', 'brand');
       const buttonContainer = link.closest('.button-container');
@@ -149,41 +141,33 @@ export default async function decorate(block) {
       }
     });
 
-    // Ensure list structure is correct - find the ul and ensure li items are properly separated
     const navList = navSections.querySelector(':scope .default-content-wrapper > ul');
+    let rebuiltList = null;
     if (navList) {
-      // Get all links first
       const allLinks = navList.querySelectorAll('a');
-      
-      // If we have links but they're not in separate li elements, restructure
       if (allLinks.length > 0) {
-        // Check if links are direct children or in li elements
-        const directLinkChildren = Array.from(navList.children).filter(child => child.tagName === 'A');
-        
+        const directLinkChildren = Array.from(navList.children)
+          .filter((child) => child.tagName === 'A');
+
         if (directLinkChildren.length > 0 || allLinks.length !== navList.querySelectorAll('li').length) {
-          // Restructure: create new ul with proper li structure
-          const newUl = document.createElement('ul');
+          rebuiltList = document.createElement('ul');
           allLinks.forEach((link) => {
             const li = document.createElement('li');
-            // Clone the link to preserve attributes
             const clonedLink = link.cloneNode(true);
             li.appendChild(clonedLink);
-            newUl.appendChild(li);
+            rebuiltList.appendChild(li);
           });
-          
-          // Replace the old ul
-          navList.parentNode.replaceChild(newUl, navList);
-          newUl.classList.add(...navList.classList);
+
+          navList.parentNode.replaceChild(rebuiltList, navList);
+          rebuiltList.classList.add(...navList.classList);
         }
       }
 
-      // Ensure each li contains exactly one link and has proper spacing
-      const finalList = navSections.querySelector(':scope .default-content-wrapper > ul') || newUl;
+      const finalList = navSections.querySelector(':scope .default-content-wrapper > ul') || rebuiltList;
       if (finalList) {
         finalList.querySelectorAll('li').forEach((li) => {
           const links = li.querySelectorAll('a');
           if (links.length > 1) {
-            // If multiple links in one li, split them
             links.forEach((link, linkIndex) => {
               if (linkIndex > 0) {
                 const newLi = document.createElement('li');
@@ -192,8 +176,7 @@ export default async function decorate(block) {
               }
             });
           }
-          
-          // Ensure link is block-level and properly styled
+
           const link = li.querySelector('a');
           if (link) {
             link.style.display = 'block';
@@ -201,8 +184,7 @@ export default async function decorate(block) {
             link.style.margin = '0';
             link.style.padding = '0.5em 0';
           }
-          
-          // Ensure li has proper spacing
+
           li.style.margin = '0';
           li.style.padding = '0';
           li.style.display = 'flex';
@@ -223,7 +205,6 @@ export default async function decorate(block) {
     });
   }
 
-  // hamburger for mobile
   const hamburger = document.createElement('div');
   hamburger.classList.add('nav-hamburger');
   hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
@@ -232,11 +213,9 @@ export default async function decorate(block) {
   hamburger.addEventListener('click', () => toggleMenu(nav, navSections));
   nav.prepend(hamburger);
   nav.setAttribute('aria-expanded', 'false');
-  // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
 
-  // Ensure nav sections are visible on desktop
   if (isDesktop.matches && navSections) {
     navSections.style.display = 'block';
     navSections.style.visibility = 'visible';
