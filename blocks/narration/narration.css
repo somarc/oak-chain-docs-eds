@@ -1,0 +1,113 @@
+.narration {
+  width: 100%;
+}
+
+.narration-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  background:
+    linear-gradient(140deg, rgba(98, 126, 234, 0.18), rgba(15, 15, 35, 0.85) 65%),
+    radial-gradient(circle at top right, rgba(147, 129, 255, 0.25), transparent 55%);
+  border: 1px solid rgba(98, 126, 234, 0.45);
+  border-radius: 16px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+  position: relative;
+  overflow: hidden;
+}
+
+.narration-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(98, 126, 234, 0.6), transparent 45%);
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.narration-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.narration-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.narration-title {
+  margin: 0;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-s);
+  color: var(--text-color);
+}
+
+.narration-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.narration-badge {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-tertiary);
+  background: rgba(98, 126, 234, 0.2);
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(98, 126, 234, 0.3);
+}
+
+.narration-description,
+.narration-note {
+  color: var(--text-secondary);
+  font-size: var(--body-font-size-xs);
+  line-height: 1.6;
+}
+
+.narration-player {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.narration-player audio {
+  width: 100%;
+  accent-color: var(--brand-primary);
+}
+
+.narration-placeholder {
+  background: var(--bg-elevated);
+  border: 1px dashed var(--border-divider);
+  color: var(--text-tertiary);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: var(--body-font-size-xs);
+}
+
+.narration-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.narration-transcript {
+  font-size: var(--body-font-size-xs);
+  color: var(--link-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.narration-transcript:hover {
+  color: var(--link-hover-color);
+  border-bottom-color: var(--link-hover-color);
+}
+
+@media (width >= 900px) {
+  .narration-card {
+    grid-template-columns: 1fr;
+    padding: 2rem;
+  }
+}
