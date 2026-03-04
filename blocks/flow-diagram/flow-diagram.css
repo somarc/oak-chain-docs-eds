@@ -1,0 +1,160 @@
+/**
+ * Flow Diagram Block Styles
+ */
+
+.flow-diagram {
+  position: relative;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  padding: 1rem;
+  margin: 2rem 0;
+}
+
+.flow-diagram:hover {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-brand);
+}
+
+/* Flow controls (Play Animation button) */
+.flow-controls {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.play-animation-btn {
+  background: linear-gradient(135deg, #627EEA 0%, #8C8DFC 100%);
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-brand);
+  font-family: var(--font-sans);
+}
+
+.play-animation-btn:hover:not(:disabled) {
+  box-shadow: var(--shadow-brand-hover);
+  transform: translateY(-1px);
+}
+
+.play-animation-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Diagram container */
+.flow-diagram-container {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+}
+
+.flow-diagram .unit-flow-wrapper {
+  background: transparent;
+  border: none;
+}
+
+/* Hint text */
+.flow-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.flow-diagram:hover .flow-hint {
+  opacity: 1;
+  color: var(--accent-primary);
+}
+
+/* Compact mode for cards */
+.flow-diagram.compact {
+  padding: 0.5rem;
+}
+
+.flow-diagram.compact .unit-info-panel {
+  display: none !important;
+}
+
+.flow-diagram.compact .flow-controls {
+  display: none;
+}
+
+/* Full width mode */
+.flow-diagram.full-width {
+  width: 100%;
+  max-width: none;
+}
+
+/* Animated background for flow diagrams */
+.flow-diagram::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(98, 126, 234, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(140, 141, 252, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.flow-diagram > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* SVG styling overrides */
+.flow-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Node styling */
+.flow-diagram .unit-flow-graph .node-circle {
+  stroke: var(--accent-primary);
+  stroke-width: 2;
+}
+
+.flow-diagram .unit-flow-graph .node-circle:hover {
+  stroke: var(--accent-secondary);
+  stroke-width: 3;
+}
+
+/* Edge styling */
+.flow-diagram .unit-flow-graph .edge-line {
+  stroke: var(--accent-primary);
+}
+
+.flow-diagram .unit-flow-graph .edge-label {
+  fill: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .flow-diagram {
+    padding: 0.75rem;
+  }
+  
+  .flow-controls {
+    justify-content: center;
+  }
+  
+  .play-animation-btn {
+    font-size: 0.85rem;
+    padding: 0.45rem 1rem;
+  }
+}

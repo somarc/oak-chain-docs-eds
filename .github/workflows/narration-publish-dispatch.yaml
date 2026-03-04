@@ -1,0 +1,65 @@
+name: Narration Publish Dispatch
+
+on:
+  repository_dispatch:
+    types:
+      - resource-published
+      - resource-published-native
+      - resource-unpublished
+
+jobs:
+  dispatch-narration:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build payload
+        id: payload
+        run: |
+          STATUS="${{ github.event.client_payload.status }}"
+          PATH_RAW="${{ github.event.client_payload.path }}"
+          ACTION="publish"
+          if [ "$STATUS" = "unpublished" ] || [ "${{ github.event.action }}" = "resource-unpublished" ]; then
+            ACTION="unpublish"
+          fi
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "path=$PATH_RAW" >> $GITHUB_OUTPUT
+          echo "action=$ACTION" >> $GITHUB_OUTPUT
+      - name: Trigger App Builder action
+        env:
+          APP_BUILDER_ENDPOINT: ${{ secrets.APP_BUILDER_ENDPOINT }}
+          APP_BUILDER_TOKEN: ${{ secrets.APP_BUILDER_TOKEN }}
+          EDS_BASE_URL: ${{ secrets.EDS_BASE_URL }}
+        run: |
+          if [ -z "$APP_BUILDER_ENDPOINT" ]; then
+            echo "APP_BUILDER_ENDPOINT secret is missing." >&2
+            exit 1
+          fi
+          if [ -z "$APP_BUILDER_TOKEN" ]; then
+            echo "APP_BUILDER_TOKEN secret is missing." >&2
+            exit 1
+          fi
+
+          payload=$(cat <<'JSON'
+          {
+            "source": "eds-publish",
+            "action": "__ACTION__",
+            "status": "__STATUS__",
+            "path": "__PATH__",
+            "timestamp": "__TIMESTAMP__",
+            "branch": "__BRANCH__",
+            "repo": "__REPO__",
+            "baseUrl": "__BASE_URL__"
+          }
+JSON
+          )
+          payload=${payload//__ACTION__/${{ steps.payload.outputs.action }}}
+          payload=${payload//__STATUS__/${{ steps.payload.outputs.status }}}
+          payload=${payload//__PATH__/${{ steps.payload.outputs.path }}}
+          payload=${payload//__TIMESTAMP__/${{ github.event.client_payload.timestamp }}}
+          payload=${payload//__BRANCH__/${{ github.event.client_payload.branch }}}
+          payload=${payload//__REPO__/${{ github.repository }}}
+          payload=${payload//__BASE_URL__/${EDS_BASE_URL}}
+
+          curl -sS -X POST "$APP_BUILDER_ENDPOINT" \
+            -H "x-narration-token: $APP_BUILDER_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "$payload"

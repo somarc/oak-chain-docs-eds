@@ -1,0 +1,57 @@
+{
+  "source": "/Users/mhess/aem/aem-code/EDS-Variant/output/.design-artifacts/eds-variant-site/sess-1772638713756-4n2j46/source.html",
+  "generatedAt": "2026-03-04T15:38:42.436Z",
+  "siteRoot": "/Users/mhess/aem/aem-code/EDS-Variant/output/eds-variant-site",
+  "page": "source.plain.html",
+  "title": "Oak Chain - Documentation",
+  "usedBlocks": [
+    "header",
+    "hero",
+    "where-to-start",
+    "fragment",
+    "protocol-path",
+    "footer"
+  ],
+  "blockPlan": [
+    {
+      "index": 0,
+      "block": "header",
+      "confidence": 1,
+      "reason": "manual overlay override"
+    },
+    {
+      "index": 1,
+      "block": "hero",
+      "confidence": 1,
+      "reason": "manual overlay override"
+    },
+    {
+      "index": 2,
+      "block": "where-to-start",
+      "confidence": 1,
+      "reason": "manual overlay override"
+    },
+    {
+      "index": 3,
+      "block": "fragment",
+      "confidence": 1,
+      "reason": "manual overlay override"
+    },
+    {
+      "index": 4,
+      "block": "protocol-path",
+      "confidence": 1,
+      "reason": "manual overlay override"
+    },
+    {
+      "index": 5,
+      "block": "footer",
+      "confidence": 1,
+      "reason": "manual overlay override"
+    }
+  ],
+  "notes": [
+    "MVP conversion preserves source visual CSS and scripts for fast parity.",
+    "Replace fragment and generic blocks with explicit EDS contracts as a second pass."
+  ]
+}

@@ -1,0 +1,79 @@
+/**
+ * Section Highlight Block
+ * For emphasized content sections with background
+ */
+
+.section-highlight {
+  background: linear-gradient(135deg, rgba(98, 126, 234, 0.08), rgba(140, 141, 252, 0.03));
+  border-left: 3px solid var(--accent-primary);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  padding: 2rem;
+  margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.section-highlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(98, 126, 234, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.section-highlight > * {
+  position: relative;
+  z-index: 1;
+}
+
+.section-highlight h2,
+.section-highlight h3 {
+  color: var(--accent-secondary);
+  margin-top: 0;
+}
+
+.section-highlight p {
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.section-highlight strong {
+  color: var(--accent-primary);
+}
+
+.section-highlight blockquote {
+  border-left-color: var(--accent-secondary);
+  background: rgba(98, 126, 234, 0.08);
+}
+
+/* Centered variant */
+.section-highlight.center {
+  text-align: center;
+  border-left: none;
+  border-top: 3px solid var(--accent-primary);
+  border-radius: var(--radius-lg);
+}
+
+/* Full-width variant */
+.section-highlight.full-width {
+  margin-left: -2rem;
+  margin-right: -2rem;
+  padding-left: 3rem;
+  padding-right: 3rem;
+  border-radius: 0;
+}
+
+@media (max-width: 768px) {
+  .section-highlight {
+    padding: 1.5rem;
+  }
+  
+  .section-highlight.full-width {
+    margin-left: -1rem;
+    margin-right: -1rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}

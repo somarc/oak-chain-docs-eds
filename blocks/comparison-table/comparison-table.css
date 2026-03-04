@@ -1,0 +1,76 @@
+/**
+ * Comparison Table Block
+ * For side-by-side comparisons (e.g., "The Bridge" section)
+ */
+
+.comparison-table {
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.comparison-table table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.comparison-table thead {
+  background: linear-gradient(135deg, rgba(98, 126, 234, 0.1), rgba(140, 141, 252, 0.05));
+  border-bottom: 2px solid var(--border-accent);
+}
+
+.comparison-table th {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--accent-secondary);
+  font-size: 1.1rem;
+}
+
+.comparison-table td {
+  padding: 1rem 1.5rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.95rem;
+}
+
+.comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.comparison-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.comparison-table tbody tr:hover {
+  background-color: rgba(98, 126, 234, 0.05);
+}
+
+/* Two-column comparison layout */
+.comparison-table.two-column th:first-child,
+.comparison-table.two-column td:first-child {
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.comparison-table.two-column th:last-child,
+.comparison-table.two-column td:last-child {
+  color: var(--accent-primary);
+  font-weight: 500;
+}
+
+/* Striped rows */
+.comparison-table.striped tbody tr:nth-child(even) {
+  background-color: rgba(98, 126, 234, 0.02);
+}
+
+@media (max-width: 768px) {
+  .comparison-table th,
+  .comparison-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+}
