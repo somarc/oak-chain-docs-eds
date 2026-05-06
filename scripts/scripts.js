@@ -78,10 +78,13 @@ function buildAutoBlocks(main) {
 
 /**
  * Prepends a guide-sidebar block on any /guide/* page.
+ * Only runs for the document's own main — nav and footer fragments call
+ * decorateMain too, and we don't want a sidebar inside the chrome.
  * @param {Element} main The container element
  */
 function buildGuideSidebar(main) {
   if (!window.location.pathname.startsWith('/guide')) return;
+  if (main !== document.querySelector('body > main')) return;
   if (main.querySelector('.guide-sidebar')) return;
   const section = document.createElement('div');
   section.append(buildBlock('guide-sidebar', { elems: [] }));
