@@ -136,6 +136,32 @@ function replaceVisualCtaGrid(md) {
   });
 }
 
+// Helix's image-transform pipeline rewrites every `<img>` in authored
+// content to attempt server-side optimization, and falls back to
+// `src="about:error"` whenever it can't resolve the source via the
+// content-bus (which it can't for repo-static and most DA-uploaded
+// media). Wrap every <img> in a picture block so Helix sees no <img>
+// in source HTML and the block decorator builds the img client-side.
+function wrapImagesAsPictures(html) {
+  // Pattern A: <a href="X"><img src="Y" alt="Z"></a> — preserve link
+  html = html.replace(/<a([^>]*?)href="([^"]+)"([^>]*?)><img([^>]*?)src="([^"]+)"([^>]*?)alt="([^"]*)"([^>]*?)\s*\/?>\s*<\/a>/g,
+    (_, a, href, b, c, src, d, alt) => buildPictureBlock(src, alt, href));
+  html = html.replace(/<a([^>]*?)href="([^"]+)"([^>]*?)><img([^>]*?)alt="([^"]*)"([^>]*?)src="([^"]+)"([^>]*?)\s*\/?>\s*<\/a>/g,
+    (_, a, href, b, c, alt, d, src) => buildPictureBlock(src, alt, href));
+  // Pattern B: standalone <img src="X" alt="Y">
+  html = html.replace(/<img([^>]*?)src="([^"]+)"([^>]*?)alt="([^"]*)"([^>]*?)\s*\/?>/g,
+    (_, a, src, b, alt) => buildPictureBlock(src, alt));
+  html = html.replace(/<img([^>]*?)alt="([^"]*)"([^>]*?)src="([^"]+)"([^>]*?)\s*\/?>/g,
+    (_, a, alt, b, src) => buildPictureBlock(src, alt));
+  return html;
+}
+
+function buildPictureBlock(src, alt, href) {
+  const altCell = `<div><div>${alt}</div></div>`;
+  const hrefCell = href ? `<div><div><a href="${href}">${href}</a></div></div>` : '';
+  return `<div class="picture"><div><div>${src}</div></div>${altCell}${hrefCell}</div>`;
+}
+
 // Marked's `<table>` output gets normalized by Helix into a div-block where
 // the first cell becomes the block class — so each table on the site
 // turns into a different one-off block (.class, .property, .tier, …) with
@@ -261,7 +287,8 @@ function convert(md) {
     const rendered = marked.parse(s).trim();
     const restored = restorePlaceholders(rendered, 'mermaid', stash);
     const tabled = wrapTablesAsDataTables(restored);
-    return `    <div>\n${tabled.replace(/^/gm, '      ')}\n    </div>`;
+    const pictured = wrapImagesAsPictures(tabled);
+    return `    <div>\n${pictured.replace(/^/gm, '      ')}\n    </div>`;
   });
 
   return `<body>\n  <header></header>\n  <main>\n${sectionHtml.join('\n')}\n  </main>\n  <footer></footer>\n</body>\n`;
