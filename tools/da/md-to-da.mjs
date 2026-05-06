@@ -76,6 +76,22 @@ function dropStyleWrapperDivs(md) {
   return md.replace(/<div style="[^"]*">\s*([\s\S]*?)\s*<\/div>/g, (_, inner) => inner);
 }
 
+// Strip inline <style> blocks — Helix normalizes them out anyway, and the
+// rules they contain have been ported to styles.css.
+function stripStyleBlocks(md) {
+  return md.replace(/<style>[\s\S]*?<\/style>\s*/g, '');
+}
+
+// VitePress publishes under base path /oak-chain-docs/. Strip the prefix
+// from absolute hrefs so the same content works on the EDS site, which
+// publishes at the root.
+function rewriteVitePressBasePath(md) {
+  return md
+    .replace(/href="\/oak-chain-docs\//g, 'href="/')
+    .replace(/src="\/oak-chain-docs\//g, 'src="/')
+    .replace(/\(\/oak-chain-docs\//g, '(/');
+}
+
 // VitePress container blocks (::: tip / warning / info / danger / details)
 // become block quotes with the kind preserved as a leading bold word.
 function replaceVitePressContainers(md) {
@@ -105,6 +121,8 @@ function splitSections(md) {
 
 function convert(md) {
   let content = stripFrontmatter(md);
+  content = stripStyleBlocks(content);
+  content = rewriteVitePressBasePath(content);
   content = replaceVitePressContainers(content);
   content = dropStyleWrapperDivs(content);
   content = replaceFlowGraph(content);

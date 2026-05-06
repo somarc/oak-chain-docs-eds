@@ -1,0 +1,189 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1320" viewBox="0 0 1600 1320">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
+    </marker>
+    <style>
+      .title { font: 700 32px sans-serif; fill: #e2e8f0; }
+      .subtitle { font: 500 16px sans-serif; fill: #94a3b8; }
+      .lane-title { font: 700 16px sans-serif; fill: #cbd5e1; }
+      .label { font: 600 14px sans-serif; fill: #0f172a; }
+      .sublabel { font: 500 12px sans-serif; fill: #1f2937; }
+      .flow { font: 600 12px sans-serif; fill: #cbd5e1; }
+      .box { stroke-width: 2; rx: 10; ry: 10; }
+      .lane { stroke: #334155; stroke-width: 1.5; fill: #111827; rx: 12; ry: 12; }
+      .boundary { stroke: #64748b; stroke-width: 1.5; stroke-dasharray: 8 6; fill: none; }
+      .line { stroke: #94a3b8; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="1600" height="1320" fill="#0b1020"/>
+  <text x="40" y="52" class="title">Oak Chain End-to-End System Map (v2)</text>
+  <text x="40" y="78" class="subtitle">A vivid systems map across experience, consensus, settlement, observability, and runtime control planes</text>
+
+  <rect x="30" y="100" width="1540" height="180" class="lane"/>
+  <text x="50" y="126" class="lane-title">Lane A: Client &amp; Experience Surfaces (Ingress / Consumption)</text>
+
+  <rect class="box" x="60" y="145" width="220" height="96" fill="#a5d8ff" stroke="#1971c2"/>
+  <text x="170" y="182" text-anchor="middle" class="label">EDS Operations Dashboard</text>
+  <text x="170" y="203" text-anchor="middle" class="sublabel">oak-chain-dashboard-eds</text>
+  <text x="170" y="222" text-anchor="middle" class="sublabel">ops telemetry + queue status</text>
+
+  <rect class="box" x="310" y="145" width="260" height="96" fill="#a5d8ff" stroke="#1971c2"/>
+  <text x="440" y="182" text-anchor="middle" class="label">EDS Content Supply Chain UI</text>
+  <text x="440" y="203" text-anchor="middle" class="sublabel">oak-content-supply-chain-web</text>
+  <text x="440" y="222" text-anchor="middle" class="sublabel">authoring + publish orchestration</text>
+
+  <rect class="box" x="610" y="145" width="220" height="96" fill="#d0bfff" stroke="#7048e8"/>
+  <text x="720" y="182" text-anchor="middle" class="label">Oak Chain SDK Clients</text>
+  <text x="720" y="203" text-anchor="middle" class="sublabel">oak-chain-sdk</text>
+  <text x="720" y="222" text-anchor="middle" class="sublabel">app integrations + auth signing</text>
+
+  <rect class="box" x="860" y="145" width="240" height="96" fill="#d0bfff" stroke="#7048e8"/>
+  <text x="980" y="182" text-anchor="middle" class="label">AEM Connector Path</text>
+  <text x="980" y="203" text-anchor="middle" class="sublabel">oak-chain-connector</text>
+  <text x="980" y="222" text-anchor="middle" class="sublabel">JCR mount + segment bridge</text>
+
+  <rect class="box" x="1130" y="145" width="410" height="96" fill="#e2e8f0" stroke="#64748b"/>
+  <text x="1335" y="182" text-anchor="middle" class="label">Read Consumers</text>
+  <text x="1335" y="203" text-anchor="middle" class="sublabel">dashboards, workers, indexers, downstream APIs</text>
+  <text x="1335" y="222" text-anchor="middle" class="sublabel">consume /api/explore, events, queue, consensus endpoints</text>
+
+  <rect x="30" y="300" width="1540" height="270" class="lane"/>
+  <text x="50" y="326" class="lane-title">Lane B: Content Supply Chain &amp; API Contract</text>
+
+  <rect class="box" x="60" y="350" width="220" height="90" fill="#a5d8ff" stroke="#1971c2"/>
+  <text x="170" y="387" text-anchor="middle" class="label">1. Ingest Request</text>
+  <text x="170" y="408" text-anchor="middle" class="sublabel">write/delete/patch payload</text>
+
+  <rect class="box" x="310" y="350" width="220" height="90" fill="#a5d8ff" stroke="#1971c2"/>
+  <text x="420" y="387" text-anchor="middle" class="label">2. Normalize &amp; Validate</text>
+  <text x="420" y="408" text-anchor="middle" class="sublabel">schema, auth, namespace, CID refs</text>
+
+  <rect class="box" x="560" y="350" width="220" height="90" fill="#ffa8a8" stroke="#c92a2a"/>
+  <text x="670" y="387" text-anchor="middle" class="label">3. Proposal Enqueue</text>
+  <text x="670" y="408" text-anchor="middle" class="sublabel">/v1/proposals/queue + durability class</text>
+
+  <rect class="box" x="810" y="350" width="230" height="90" fill="#ffa8a8" stroke="#c92a2a"/>
+  <text x="925" y="387" text-anchor="middle" class="label">4. Consensus Execute</text>
+  <text x="925" y="408" text-anchor="middle" class="sublabel">deterministic apply + ack progression</text>
+
+  <rect class="box" x="1070" y="350" width="220" height="90" fill="#b2f2bb" stroke="#2f9e44"/>
+  <text x="1180" y="387" text-anchor="middle" class="label">5. Segment Commit</text>
+  <text x="1180" y="408" text-anchor="middle" class="sublabel">Oak segment/TAR state update</text>
+
+  <rect class="box" x="1320" y="350" width="220" height="90" fill="#ffec99" stroke="#f08c00"/>
+  <text x="1430" y="387" text-anchor="middle" class="label">6. CID Mapping</text>
+  <text x="1430" y="408" text-anchor="middle" class="sublabel">binary refs tracked, payload off-chain</text>
+
+  <rect class="box" x="250" y="465" width="450" height="84" fill="#e2e8f0" stroke="#64748b"/>
+  <text x="475" y="499" text-anchor="middle" class="label">Read Path A: /api/explore + wallet namespace traversal</text>
+  <text x="475" y="520" text-anchor="middle" class="sublabel">for applications, explorers, and ingestion verifiers</text>
+
+  <rect class="box" x="740" y="465" width="450" height="84" fill="#e2e8f0" stroke="#64748b"/>
+  <text x="965" y="499" text-anchor="middle" class="label">Read Path B: /v1/events + /v1/proposals/* + /v1/consensus/*</text>
+  <text x="965" y="520" text-anchor="middle" class="sublabel">for dashboards, reliability monitors, and ops automation</text>
+
+  <rect x="30" y="590" width="1540" height="220" class="lane"/>
+  <text x="50" y="616" class="lane-title">Lane C: Consensus Core, Storage Plane, and Economic Settlement</text>
+
+  <rect class="box" x="60" y="640" width="290" height="120" fill="#d0bfff" stroke="#7048e8"/>
+  <text x="205" y="680" text-anchor="middle" class="label">oak-segment-consensus</text>
+  <text x="205" y="702" text-anchor="middle" class="sublabel">proposal ordering + state machine rules</text>
+  <text x="205" y="722" text-anchor="middle" class="sublabel">conflict handling + deterministic replay</text>
+
+  <rect class="box" x="390" y="640" width="280" height="120" fill="#ffec99" stroke="#f08c00"/>
+  <text x="530" y="680" text-anchor="middle" class="label">Aeron Cluster / Raft</text>
+  <text x="530" y="702" text-anchor="middle" class="sublabel">leader election + log replication</text>
+  <text x="530" y="722" text-anchor="middle" class="sublabel">follower catch-up + finalization quorum</text>
+
+  <rect class="box" x="710" y="640" width="280" height="120" fill="#b2f2bb" stroke="#2f9e44"/>
+  <text x="850" y="680" text-anchor="middle" class="label">Validator Storage Plane</text>
+  <text x="850" y="702" text-anchor="middle" class="sublabel">segment store + compaction/gc lifecycle</text>
+  <text x="850" y="722" text-anchor="middle" class="sublabel">cross-cluster read projection mounts</text>
+
+  <rect class="box" x="1030" y="640" width="250" height="120" fill="#ffc9c9" stroke="#e03131"/>
+  <text x="1155" y="680" text-anchor="middle" class="label">Smart Contracts</text>
+  <text x="1155" y="702" text-anchor="middle" class="sublabel">payment verification</text>
+  <text x="1155" y="722" text-anchor="middle" class="sublabel">durability/finality policy hooks</text>
+
+  <rect class="box" x="1320" y="640" width="220" height="120" fill="#ffec99" stroke="#f08c00"/>
+  <text x="1430" y="680" text-anchor="middle" class="label">IPFS Binary Layer</text>
+  <text x="1430" y="702" text-anchor="middle" class="sublabel">content-addressed payloads</text>
+  <text x="1430" y="722" text-anchor="middle" class="sublabel">validators hold CIDs only</text>
+
+  <rect x="30" y="830" width="1540" height="250" class="lane"/>
+  <text x="50" y="856" class="lane-title">Lane D: Separation of Concerns, Boundaries, and Operational Signals</text>
+
+  <rect x="60" y="890" width="500" height="150" class="boundary"/>
+  <text x="80" y="913" class="flow">Boundary 1: Experience &amp; App Surface (EDS apps, SDK, Connector)</text>
+  <text x="80" y="937" class="flow">Concern: UX, authoring workflows, integration adapters</text>
+  <text x="80" y="961" class="flow">Not responsible for: consensus ordering, finality truth, compaction safety</text>
+
+  <rect x="590" y="890" width="520" height="150" class="boundary"/>
+  <text x="610" y="913" class="flow">Boundary 2: Validator Truth Plane (consensus + storage)</text>
+  <text x="610" y="937" class="flow">Concern: deterministic apply, replication, durable state transitions</text>
+  <text x="610" y="961" class="flow">Primary APIs: /v1/proposals/*, /v1/consensus/*, /v1/gc/*, /api/explore</text>
+
+  <rect x="1140" y="890" width="400" height="150" class="boundary"/>
+  <text x="1160" y="913" class="flow">Boundary 3: Settlement &amp; Content Addressing</text>
+  <text x="1160" y="937" class="flow">Concern: payment verification + off-chain binary integrity linkage</text>
+  <text x="1160" y="961" class="flow">Systems: Ethereum contracts, IPFS, validator CID references</text>
+
+  <path class="line" d="M170 241 L170 350"/>
+  <text x="178" y="310" class="flow">Write path entry</text>
+
+  <path class="line" d="M280 395 L310 395"/>
+  <path class="line" d="M530 395 L560 395"/>
+  <path class="line" d="M780 395 L810 395"/>
+  <path class="line" d="M1040 395 L1070 395"/>
+  <path class="line" d="M1290 395 L1320 395"/>
+
+  <path class="line" d="M925 440 L925 465"/>
+  <path class="line" d="M700 507 L740 507"/>
+  <path class="line" d="M1190 507 L1330 507 L1330 465"/>
+
+  <path class="line" d="M205 549 L205 640"/>
+  <path class="line" d="M350 700 L390 700"/>
+  <path class="line" d="M670 700 L710 700"/>
+  <path class="line" d="M990 700 L1030 700"/>
+  <path class="line" d="M1280 700 L1320 700"/>
+
+  <path class="line" d="M1155 760 L1155 845 L450 845 L450 890"/>
+  <text x="920" y="838" class="flow">Policy + settlement signals influence ingest/authorization policy</text>
+
+  <path class="line" d="M850 760 L850 890"/>
+  <text x="860" y="835" class="flow">Operational truth exported upward as primary signals</text>
+
+  <path class="line" d="M1335 241 L1335 350 L1540 350 L1540 700"/>
+  <text x="1344" y="333" class="flow">Read consumers subscribe to queue/events/consensus</text>
+
+  <rect x="30" y="1100" width="1540" height="190" class="lane"/>
+  <text x="50" y="1126" class="lane-title">Lane E: Runtime &amp; Control Plane Extensions</text>
+
+  <rect class="box" x="60" y="1145" width="260" height="120" fill="#a5d8ff" stroke="#1971c2"/>
+  <text x="190" y="1186" text-anchor="middle" class="label">oak-ingress-normalizer</text>
+  <text x="190" y="1208" text-anchor="middle" class="sublabel">normalization + policy guards</text>
+  <text x="190" y="1228" text-anchor="middle" class="sublabel">front-door quality gate</text>
+
+  <rect class="box" x="350" y="1145" width="300" height="120" fill="#d0bfff" stroke="#7048e8"/>
+  <text x="500" y="1186" text-anchor="middle" class="label">oak-chain-edge-worker + io</text>
+  <text x="500" y="1208" text-anchor="middle" class="sublabel">worker APIs + edge event fan-out</text>
+  <text x="500" y="1228" text-anchor="middle" class="sublabel">integration-grade delivery bridge</text>
+
+  <rect class="box" x="680" y="1145" width="240" height="120" fill="#b2f2bb" stroke="#2f9e44"/>
+  <text x="800" y="1186" text-anchor="middle" class="label">oak-meta</text>
+  <text x="800" y="1208" text-anchor="middle" class="sublabel">schema + metadata contracts</text>
+  <text x="800" y="1228" text-anchor="middle" class="sublabel">cross-service consistency</text>
+
+  <rect class="box" x="950" y="1145" width="310" height="120" fill="#ffec99" stroke="#f08c00"/>
+  <text x="1105" y="1186" text-anchor="middle" class="label">oak-magnum-oakus</text>
+  <text x="1105" y="1208" text-anchor="middle" class="sublabel">experimental orchestration + tooling</text>
+  <text x="1105" y="1228" text-anchor="middle" class="sublabel">kept outside critical-path consensus</text>
+
+  <path class="line" d="M610 1060 L190 1060 L190 1145"/>
+  <path class="line" d="M610 1060 L500 1060 L500 1145"/>
+  <path class="line" d="M610 1060 L800 1060 L800 1145"/>
+  <path class="line" d="M610 1060 L1105 1060 L1105 1145"/>
+  <text x="620" y="1048" class="flow">Observability + policy signals feed runtime extensions</text>
+</svg>

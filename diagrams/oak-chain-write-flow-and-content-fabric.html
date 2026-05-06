@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oak Chain: Write Flow and Distributed Content Fabric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f0e8;
+      --bg-accent: #ece5d8;
+      --surface: rgba(255, 251, 244, 0.86);
+      --surface-strong: rgba(255, 253, 248, 0.94);
+      --surface-tint: rgba(18, 68, 97, 0.06);
+      --border: rgba(19, 43, 61, 0.16);
+      --border-strong: rgba(19, 43, 61, 0.28);
+      --text: #173246;
+      --text-dim: #5d6d7c;
+      --ink-blue: #20506c;
+      --ink-blue-dim: rgba(32, 80, 108, 0.12);
+      --teal: #0d7284;
+      --teal-dim: rgba(13, 114, 132, 0.14);
+      --gold: #b7781f;
+      --gold-dim: rgba(183, 120, 31, 0.12);
+      --sage: #3e6b53;
+      --sage-dim: rgba(62, 107, 83, 0.12);
+      --rose: #9b4e48;
+      --rose-dim: rgba(155, 78, 72, 0.12);
+      --shadow-soft: 0 18px 50px rgba(23, 50, 70, 0.09);
+      --shadow-strong: 0 28px 80px rgba(23, 50, 70, 0.14);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --max-width: 1280px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0c1620;
+        --bg-accent: #11212d;
+        --surface: rgba(16, 28, 39, 0.86);
+        --surface-strong: rgba(15, 25, 35, 0.94);
+        --surface-tint: rgba(114, 178, 209, 0.09);
+        --border: rgba(181, 201, 214, 0.14);
+        --border-strong: rgba(181, 201, 214, 0.24);
+        --text: #ecf2f6;
+        --text-dim: #9cb0bf;
+        --ink-blue: #8bc2df;
+        --ink-blue-dim: rgba(139, 194, 223, 0.12);
+        --teal: #67c1cd;
+        --teal-dim: rgba(103, 193, 205, 0.16);
+        --gold: #e1b15f;
+        --gold-dim: rgba(225, 177, 95, 0.16);
+        --sage: #8dcb9f;
+        --sage-dim: rgba(141, 203, 159, 0.14);
+        --rose: #db9084;
+        --rose-dim: rgba(219, 144, 132, 0.12);
+        --shadow-soft: 0 18px 50px rgba(0, 0, 0, 0.3);
+        --shadow-strong: 0 28px 80px rgba(0, 0, 0, 0.4);
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "IBM Plex Sans", ui-sans-serif, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 20%, rgba(183, 120, 31, 0.1), transparent 32%),
+        radial-gradient(circle at 85% 12%, rgba(13, 114, 132, 0.14), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-accent) 100%);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(19, 43, 61, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(19, 43, 61, 0.045) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.75), transparent 92%);
+      opacity: 0.4;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .shell {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 32px 20px 72px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 22px;
+      padding: 14px 18px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.22);
+      backdrop-filter: blur(18px);
+      border-radius: 999px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .topbar .tagline {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .topnav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .topnav a {
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      transition: transform 160ms ease, border-color 160ms ease, color 160ms ease, background 160ms ease;
+    }
+
+    .topnav a:hover {
+      transform: translateY(-1px);
+      border-color: var(--border-strong);
+      color: var(--text);
+      background: var(--surface-strong);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .hero-panel,
+    .hero-side {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, var(--surface-strong) 0%, var(--surface) 100%);
+      box-shadow: var(--shadow-strong);
+      overflow: hidden;
+    }
+
+    .hero-panel {
+      padding: 32px;
+      position: relative;
+    }
+
+    .hero-panel::after {
+      content: "";
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--teal-dim) 0%, transparent 70%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 40px;
+      height: 1px;
+      background: var(--border-strong);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.9rem, 5vw, 5rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+    }
+
+    .hero-lead {
+      max-width: 64ch;
+      margin-top: 18px;
+      font-size: 1.08rem;
+      color: var(--text-dim);
+    }
+
+    .principles {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .principle {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.26);
+    }
+
+    .principle strong {
+      display: block;
+      font-size: 0.94rem;
+      margin-bottom: 6px;
+    }
+
+    .hero-side {
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .metric .value {
+      display: block;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .metric .label {
+      font-size: 0.84rem;
+      color: var(--text-dim);
+    }
+
+    .mini-note {
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, var(--ink-blue-dim), transparent);
+      border: 1px solid rgba(32, 80, 108, 0.18);
+    }
+
+    .mini-note h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    section {
+      margin-bottom: 28px;
+    }
+
+    .section-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: linear-gradient(180deg, var(--surface-strong), var(--surface));
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 26px 28px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      font-family: "Instrument Serif", Georgia, serif;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+    }
+
+    .section-header p {
+      margin: 10px 0 0;
+      max-width: 70ch;
+      color: var(--text-dim);
+    }
+
+    .section-badge {
+      align-self: start;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      background: var(--surface);
+      white-space: nowrap;
+    }
+
+    .content {
+      padding: 24px 28px 30px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+      gap: 22px;
+    }
+
+    .write-flow-layout {
+      display: grid;
+      gap: 18px;
+    }
+
+    .diagram-card,
+    .notes-card,
+    .code-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 18px;
+      min-width: 0;
+    }
+
+    .diagram-card h3,
+    .notes-card h3,
+    .code-card h3 {
+      margin: 0 0 12px;
+      font-size: 1.02rem;
+    }
+
+    .consensus-wide {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1));
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    .consensus-canvas {
+      min-width: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .actor-rail {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(92px, 1fr));
+      gap: 10px;
+    }
+
+    .actor-chip {
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      text-align: center;
+      font-size: 0.78rem;
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--text-dim);
+    }
+
+    .flow-lane {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flow-lane::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    }
+
+    .flow-lane-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flow-lane-head strong {
+      font-size: 0.96rem;
+    }
+
+    .flow-lane-head span {
+      font-size: 0.84rem;
+      color: var(--text-dim);
+    }
+
+    .redirect-track {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr 1fr;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+      align-items: center;
+    }
+
+    .redirect-stage,
+    .main-stage {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+      padding: 14px;
+      min-width: 0;
+      position: relative;
+    }
+
+    .redirect-stage {
+      background: linear-gradient(180deg, var(--rose-dim), rgba(255, 255, 255, 0.05));
+      border-color: rgba(155, 78, 72, 0.18);
+    }
+
+    .stage-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+
+    .stage-kicker::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--rose);
+    }
+
+    .main-stage .stage-kicker::before {
+      background: var(--ink-blue);
+    }
+
+    .main-stage.quorum .stage-kicker::before {
+      background: var(--teal);
+    }
+
+    .main-stage.applied .stage-kicker::before {
+      background: var(--sage);
+    }
+
+    .redirect-stage strong,
+    .main-stage strong {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .redirect-stage p,
+    .main-stage p {
+      margin: 0;
+      font-size: 0.83rem;
+      color: var(--text-dim);
+    }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--ink-blue);
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+    }
+
+    .main-track {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(140px, 1fr));
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .main-stage.pending {
+      background: linear-gradient(180deg, var(--gold-dim), rgba(255, 255, 255, 0.05));
+      border-color: rgba(183, 120, 31, 0.18);
+    }
+
+    .main-stage.quorum {
+      background: linear-gradient(180deg, var(--teal-dim), rgba(255, 255, 255, 0.05));
+      border-color: rgba(13, 114, 132, 0.22);
+    }
+
+    .main-stage.applied {
+      background: linear-gradient(180deg, var(--sage-dim), rgba(255, 255, 255, 0.05));
+      border-color: rgba(62, 107, 83, 0.18);
+    }
+
+    .main-stage::after {
+      content: "→";
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--ink-blue);
+      font-size: 1rem;
+    }
+
+    .main-stage:last-child::after {
+      display: none;
+    }
+
+    .flow-footnote {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .foot-pill {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-align: center;
+    }
+
+    .notes-list,
+    .invariant-grid,
+    .code-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .note {
+      padding: 14px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+    }
+
+    .note strong {
+      display: block;
+      font-size: 0.93rem;
+      margin-bottom: 4px;
+    }
+
+    .boundary-band .notes-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .boundary-band .note {
+      height: 100%;
+    }
+
+    .durability-ladder {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .step {
+      padding: 14px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      min-height: 118px;
+      background: var(--surface);
+      position: relative;
+    }
+
+    .step .number {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      align-items: center;
+      justify-content: center;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.82rem;
+      margin-bottom: 10px;
+      background: var(--ink-blue-dim);
+      color: var(--ink-blue);
+    }
+
+    .step h4 {
+      margin: 0 0 8px;
+      font-size: 0.94rem;
+    }
+
+    .step p {
+      margin: 0;
+      font-size: 0.83rem;
+      color: var(--text-dim);
+    }
+
+    .step.soft { background: linear-gradient(180deg, var(--rose-dim), transparent); }
+    .step.local { background: linear-gradient(180deg, var(--gold-dim), transparent); }
+    .step.quorum { background: linear-gradient(180deg, var(--teal-dim), transparent); }
+    .step.applied { background: linear-gradient(180deg, var(--sage-dim), transparent); }
+
+    .fabric-summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .fabric-summary .fact {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .fact h3 {
+      margin: 0 0 8px;
+      font-size: 1rem;
+    }
+
+    .fact p {
+      margin: 0;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+    }
+
+    .fabric-wide {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.1));
+      padding: 16px;
+      overflow-x: auto;
+    }
+
+    .fabric-canvas {
+      min-width: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .plane-lane {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .plane-lane::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+      opacity: 0.7;
+    }
+
+    .lane-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .lane-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+    }
+
+    .lane-label::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--ink-blue);
+      box-shadow: 0 0 0 6px var(--ink-blue-dim);
+    }
+
+    .plane-read .lane-label::before {
+      background: var(--gold);
+      box-shadow: 0 0 0 6px var(--gold-dim);
+    }
+
+    .plane-discovery .lane-label::before {
+      background: var(--sage);
+      box-shadow: 0 0 0 6px var(--sage-dim);
+    }
+
+    .lane-copy {
+      max-width: 60ch;
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      text-align: right;
+    }
+
+    .cluster-row,
+    .mount-row,
+    .discovery-row {
+      display: grid;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cluster-row {
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+    }
+
+    .cluster-card,
+    .mount-card,
+    .discovery-card {
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.08));
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .cluster-title,
+    .mount-title,
+    .discovery-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .cluster-title strong,
+    .mount-title strong,
+    .discovery-title strong {
+      font-size: 0.98rem;
+    }
+
+    .cluster-title span,
+    .mount-title span,
+    .discovery-title span {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.74rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .cluster-graph {
+      display: grid;
+      grid-template-columns: minmax(84px, 0.9fr) minmax(140px, 1.3fr) minmax(84px, 0.9fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .replica-stack {
+      display: grid;
+      gap: 8px;
+    }
+
+    .replica-pill,
+    .core-node,
+    .mount-pill,
+    .hint-pill {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-strong);
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      text-align: center;
+      color: var(--text);
+    }
+
+    .replica-pill.leader {
+      background: linear-gradient(180deg, var(--teal-dim), rgba(255, 255, 255, 0.08));
+      border-color: rgba(13, 114, 132, 0.24);
+    }
+
+    .core-stack {
+      display: grid;
+      gap: 8px;
+      position: relative;
+    }
+
+    .core-stack::before,
+    .core-stack::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 32px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--ink-blue), transparent);
+    }
+
+    .core-stack::before {
+      left: -28px;
+    }
+
+    .core-stack::after {
+      right: -28px;
+    }
+
+    .core-node.view {
+      background: linear-gradient(180deg, var(--gold-dim), rgba(255, 255, 255, 0.08));
+      border-color: rgba(183, 120, 31, 0.26);
+    }
+
+    .core-node.repo {
+      background: linear-gradient(180deg, var(--ink-blue-dim), rgba(255, 255, 255, 0.08));
+      border-color: rgba(32, 80, 108, 0.22);
+      font-weight: 600;
+    }
+
+    .cluster-foot {
+      margin-top: 12px;
+      font-size: 0.83rem;
+      color: var(--text-dim);
+    }
+
+    .mount-row {
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+    }
+
+    .mount-flow {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mount-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+    }
+
+    .mount-origin {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .arrow {
+      font-family: "IBM Plex Mono", monospace;
+      color: var(--gold);
+      font-size: 0.92rem;
+    }
+
+    .mount-pill {
+      background: linear-gradient(180deg, var(--gold-dim), rgba(255, 255, 255, 0.08));
+      border-color: rgba(183, 120, 31, 0.24);
+      text-align: left;
+    }
+
+    .discovery-row {
+      grid-template-columns: minmax(260px, 1.15fr) minmax(220px, 1fr) minmax(220px, 1fr);
+      align-items: stretch;
+    }
+
+    .discovery-card {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hint-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hint-pill {
+      background: linear-gradient(180deg, var(--sage-dim), rgba(255, 255, 255, 0.08));
+      border-color: rgba(62, 107, 83, 0.22);
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+
+    .invariant-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      margin-top: 18px;
+    }
+
+    .invariant {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .invariant .cap {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    .invariant strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .code-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .code-card code,
+    .footnote code,
+    .mono {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.82rem;
+    }
+
+    .code-card p,
+    .code-card ul,
+    .code-card li,
+    .footnote {
+      color: var(--text-dim);
+    }
+
+    .code-card .path {
+      display: block;
+      color: var(--text);
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+
+    .code-card ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      padding: 18px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--ink-blue-dim), transparent);
+    }
+
+    .footer-note strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .footnote {
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 1100px) {
+      .hero,
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .fabric-summary,
+      .invariant-grid,
+      .code-grid,
+      .durability-ladder {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .boundary-band .notes-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .cluster-row,
+      .mount-row,
+      .discovery-row {
+        grid-template-columns: 1fr;
+      }
+
+      .fabric-canvas {
+        min-width: 0;
+      }
+
+      .actor-rail,
+      .main-track,
+      .flow-footnote {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .redirect-track {
+        grid-template-columns: 1fr;
+      }
+
+      .consensus-canvas {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        padding: 18px 14px 54px;
+      }
+
+      .topbar {
+        border-radius: 20px;
+        padding: 14px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-panel,
+      .hero-side,
+      .section-card {
+        border-radius: 24px;
+      }
+
+      .hero-panel {
+        padding: 24px;
+      }
+
+      .section-header,
+      .content {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .principles,
+      .metric-grid,
+      .fabric-summary,
+      .invariant-grid,
+      .code-grid,
+      .durability-ladder {
+        grid-template-columns: 1fr;
+      }
+
+      .boundary-band .notes-list {
+        grid-template-columns: 1fr;
+      }
+
+      .lane-head {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .lane-copy {
+        text-align: left;
+      }
+
+      .cluster-graph {
+        grid-template-columns: 1fr;
+      }
+
+      .core-stack::before,
+      .core-stack::after {
+        display: none;
+      }
+
+      .actor-rail,
+      .main-track,
+      .flow-footnote {
+        grid-template-columns: 1fr;
+      }
+
+      .main-stage::after {
+        display: none;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="topbar">
+      <div class="tagline">Oak Chain visual explainer · live model from <span class="mono">oak-segment-consensus</span></div>
+      <nav class="topnav">
+        <a href="#write-flow">Write Flow</a>
+        <a href="#content-fabric">Content Fabric</a>
+        <a href="#code-anchors">Code Anchors</a>
+      </nav>
+    </div>
+
+    <header class="hero">
+      <section class="hero-panel">
+        <div class="eyebrow">Aeron Locality · Cross-Cluster Read Fabric</div>
+        <h1>Each cluster is an Oak fiefdom. The network is a fabric, not one giant quorum.</h1>
+        <p class="hero-lead">
+          Inside a cluster, writes are ordered by Aeron and applied deterministically on every validator.
+          Across clusters, content moves through lazy read-only mounts over HTTP. The current runtime is a deliberate split:
+          hard consensus locally, soft visibility globally.
+        </p>
+        <div class="principles">
+          <div class="principle">
+            <strong>Any node can accept ingress</strong>
+            Followers can receive the HTTP request, but only the leader orders the replicated log entry.
+          </div>
+          <div class="principle">
+            <strong>Accepted is not committed</strong>
+            The API returns <span class="mono">202 Accepted</span> once the proposal is queued, before quorum commit.
+          </div>
+          <div class="principle">
+            <strong>Remote clusters stay read-only</strong>
+            Foreign shard content is mounted into a composite read view and never enters the local Aeron state machine.
+          </div>
+          <div class="principle">
+            <strong>No cross-cluster Aeron</strong>
+            Cluster-to-cluster visibility is lazy and mount-driven. Discovery and SSE hints can help, but they are not authoritative.
+          </div>
+        </div>
+      </section>
+
+      <aside class="hero-side">
+        <div class="metric-grid">
+          <div class="metric">
+            <span class="value">1</span>
+            <span class="label">leader orders writes inside each cluster</span>
+          </div>
+          <div class="metric">
+            <span class="value">N</span>
+            <span class="label">followers replay the same deterministic callback</span>
+          </div>
+          <div class="metric">
+            <span class="value">202</span>
+            <span class="label">accepted state returned before Aeron commit</span>
+          </div>
+          <div class="metric">
+            <span class="value">307</span>
+            <span class="label">wrong-shard write redirect before local queueing</span>
+          </div>
+        </div>
+        <div class="mini-note">
+          <h3>What the page is showing</h3>
+          <p>
+            The first section explains the real write path in a single Aeron cluster, including the queue,
+            disk-backed pending state, quorum commit, and local application boundary. The second section explains
+            the clusters-of-clusters model: authoritative local repositories plus remote lazy mounts.
+          </p>
+        </div>
+      </aside>
+    </header>
+
+    <section id="write-flow" class="section-card">
+      <div class="section-header">
+        <div>
+          <h2>Write Flow Inside One Aeron Cluster</h2>
+          <p>
+            The runtime accepts a write on any validator, enforces shard ownership before queueing, persists the pending proposal locally,
+            waits for payment proof, then releases to Aeron ingress. The leader orders the log. All nodes apply the same state transition.
+          </p>
+        </div>
+        <div class="section-badge">Intra-cluster consensus</div>
+      </div>
+      <div class="content">
+        <div class="write-flow-layout">
+          <div class="diagram-card">
+            <h3>Consensus sequence</h3>
+            <div class="consensus-wide">
+              <div class="consensus-canvas">
+                <div class="actor-rail">
+                  <div class="actor-chip">Client</div>
+                  <div class="actor-chip">HTTP API</div>
+                  <div class="actor-chip">Shard gate</div>
+                  <div class="actor-chip">Queue</div>
+                  <div class="actor-chip">Disk persistence</div>
+                  <div class="actor-chip">Payment verifier</div>
+                  <div class="actor-chip">Aeron ingress</div>
+                  <div class="actor-chip">Leader</div>
+                  <div class="actor-chip">Followers</div>
+                  <div class="actor-chip">Replica apply + SSE</div>
+                </div>
+
+                <div class="flow-lane">
+                  <div class="flow-lane-head">
+                    <strong>Redirect short-circuit</strong>
+                    <span>Foreign-wallet writes never enter the local queue or Aeron path.</span>
+                  </div>
+                  <div class="redirect-track">
+                    <div class="redirect-stage">
+                      <div class="stage-kicker">Client → HTTP</div>
+                      <strong>Request arrives on any validator</strong>
+                      <p>The request can land on a follower or the leader. Entry node does not imply ordering authority.</p>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    <div class="redirect-stage">
+                      <div class="stage-kicker">Shard authority</div>
+                      <strong>Wallet resolves to another shard</strong>
+                      <p>The local node detects foreign ownership before queueing.</p>
+                    </div>
+                  </div>
+                  <div class="flow-footnote">
+                    <div class="foot-pill">Response: <span class="mono">307 Temporary Redirect</span></div>
+                    <div class="foot-pill">Payload includes wallet prefix + redirect target</div>
+                    <div class="foot-pill">No local queue entry. No Aeron ingress.</div>
+                  </div>
+                </div>
+
+                <div class="flow-lane">
+                  <div class="flow-lane-head">
+                    <strong>Local-shard commit path</strong>
+                    <span>This is the full path for a wallet the cluster actually owns.</span>
+                  </div>
+                  <div class="main-track">
+                    <div class="main-stage">
+                      <div class="stage-kicker">1 · HTTP ingress</div>
+                      <strong>Validate wallet and request shape</strong>
+                      <p>The node parses the write, normalizes the wallet, and confirms local shard ownership.</p>
+                    </div>
+                    <div class="main-stage pending">
+                      <div class="stage-kicker">2 · Queue admission</div>
+                      <strong>Queue proposal and return accepted</strong>
+                      <p><span class="mono">queueProposal(...)</span> records the proposal and the API returns <span class="mono">202 Accepted</span> with <span class="mono">state=PENDING</span>.</p>
+                    </div>
+                    <div class="main-stage pending">
+                      <div class="stage-kicker">3 · Local durability</div>
+                      <strong>Persist pending proposal locally</strong>
+                      <p>The queue flushes to <span class="mono">queued-proposals.bin</span>. By default this is asynchronous, which keeps IO lighter but leaves a small pre-flush window.</p>
+                    </div>
+                    <div class="main-stage pending">
+                      <div class="stage-kicker">4 · Verification</div>
+                      <strong>Wait for payment proof and release</strong>
+                      <p>The verifier confirms payment and moves the proposal into adaptive release / append-ready state.</p>
+                    </div>
+                    <div class="main-stage quorum">
+                      <div class="stage-kicker">5 · Aeron ingress</div>
+                      <strong>Offer the proposal into the cluster</strong>
+                      <p>The internal Aeron cluster client appends the write toward the leader through ingress.</p>
+                    </div>
+                    <div class="main-stage quorum">
+                      <div class="stage-kicker">6 · Quorum commit</div>
+                      <strong>Leader orders, followers replicate</strong>
+                      <p>The leader decides log order. Followers replicate through Raft. This is the real cluster durability boundary.</p>
+                    </div>
+                    <div class="main-stage applied">
+                      <div class="stage-kicker">7 · Replica apply</div>
+                      <strong>All nodes apply and emit hints</strong>
+                      <p><span class="mono">onSessionMessage(...)</span> runs on every node, merges into the authoritative local store, and can emit advisory SSE events.</p>
+                    </div>
+                  </div>
+                  <div class="flow-footnote">
+                    <div class="foot-pill">Followers can receive the request, but not decide log order.</div>
+                    <div class="foot-pill">Accepted ≠ committed. Quorum commit happens later than API acceptance.</div>
+                    <div class="foot-pill">All replicas run the same deterministic apply callback.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="notes-card boundary-band">
+            <h3>Hard boundaries</h3>
+            <div class="notes-list">
+              <div class="note">
+                <strong>Ingress can land on any node</strong>
+                A follower can receive the request, but it still forwards the write through cluster ingress. Followers do not self-authorize local mutation.
+              </div>
+              <div class="note">
+                <strong>Queue durability exists before commit</strong>
+                Pending proposals are persisted to <span class="mono">queued-proposals.bin</span> and replayed on restart, but defaults are asynchronous.
+              </div>
+              <div class="note">
+                <strong>Accepted and committed are different states</strong>
+                <span class="mono">202 Accepted</span> means “queued and pending,” not “quorum committed.” The small residual loss window lives between acceptance and flush/commit.
+              </div>
+              <div class="note">
+                <strong>Application happens on all replicas</strong>
+                After Aeron replicates the message, the clustered service callback runs on every node in the same order.
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <div class="durability-ladder">
+          <div class="step soft">
+            <div class="number">1</div>
+            <h4>Received</h4>
+            <p>The HTTP node parses the request, validates the wallet, and checks local shard authority.</p>
+          </div>
+          <div class="step soft">
+            <div class="number">2</div>
+            <h4>Queued</h4>
+            <p>The proposal enters the unverified queue and becomes visible to local queue management.</p>
+          </div>
+          <div class="step local">
+            <div class="number">3</div>
+            <h4>Flushed</h4>
+            <p>The pending proposal is persisted locally. Defaults are async: <span class="mono">250ms</span> or <span class="mono">100</span> items.</p>
+          </div>
+          <div class="step local">
+            <div class="number">4</div>
+            <h4>Verified</h4>
+            <p>The payment proof resolves and the proposal moves into adaptive release / ready-to-append flow.</p>
+          </div>
+          <div class="step quorum">
+            <div class="number">5</div>
+            <h4>Ingressed</h4>
+            <p>The node offers the write to Aeron ingress using the internal cluster client.</p>
+          </div>
+          <div class="step quorum">
+            <div class="number">6</div>
+            <h4>Committed</h4>
+            <p>The leader orders the message and followers replicate it through Raft.</p>
+          </div>
+          <div class="step applied">
+            <div class="number">7</div>
+            <h4>Applied</h4>
+            <p>All nodes run the deterministic handler and merge into their own local authoritative replica.</p>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          <strong>Operational truth</strong>
+          <div class="footnote">
+            The small “accepted but not yet durable everywhere” window is deliberate. The system keeps async queue persistence by default to avoid forcing synchronous disk IO on every accepted request.
+            Real durability comes from the combination of local queue persistence and Aeron quorum commit, not from pretending those are the same event.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="content-fabric" class="section-card">
+      <div class="section-header">
+        <div>
+          <h2>Distributed Content Fabric: Clusters of Clusters</h2>
+          <p>
+            Each cluster owns a prefix range and its own writable repository. Remote clusters are mounted into a composite read view over HTTP.
+            The local validator exposes one authoritative write path and one broader read surface. Cross-cluster visibility is lazy by design.
+          </p>
+        </div>
+        <div class="section-badge">Cross-cluster read fabric</div>
+      </div>
+      <div class="content">
+        <div class="fabric-summary">
+          <div class="fact">
+            <h3>Local Aeron only</h3>
+            <p>Each fiefdom runs its own leader + followers + local writable Oak repository.</p>
+          </div>
+          <div class="fact">
+            <h3>Remote mounts stay outside quorum</h3>
+            <p>Foreign shard content is exposed through <span class="mono">LazyHttpNodeStore</span> and never becomes part of local consensus state.</p>
+          </div>
+          <div class="fact">
+            <h3>Authority is prefix-scoped</h3>
+            <p>Current sharding uses wallet L1 prefixes under the real path shape <span class="mono">/oak-chain/XX/YY/ZZ/0xWALLET</span>.</p>
+          </div>
+          <div class="fact">
+            <h3>Discovery can stay advisory</h3>
+            <p>Signed announcements and SSE hints can improve mount awareness later without becoming a second consensus plane.</p>
+          </div>
+        </div>
+
+        <div class="diagram-card">
+          <h3>Three-plane model</h3>
+          <div class="fabric-wide">
+            <div class="fabric-canvas">
+              <div class="plane-lane plane-consensus">
+                <div class="lane-head">
+                  <div class="lane-label">Plane 1 · Local consensus plane</div>
+                  <div class="lane-copy">Each cluster owns one writable repository. Aeron stays inside the shard boundary and never spans across clusters.</div>
+                </div>
+                <div class="cluster-row">
+                  <article class="cluster-card">
+                    <div class="cluster-title">
+                      <strong>Cluster A</strong>
+                      <span>Prefixes 00-7f</span>
+                    </div>
+                    <div class="cluster-graph">
+                      <div class="replica-stack">
+                        <div class="replica-pill leader">Leader</div>
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Follower</div>
+                      </div>
+                      <div class="core-stack">
+                        <div class="core-node">Validator APIs</div>
+                        <div class="core-node view">Composite read view</div>
+                        <div class="core-node repo">Authoritative local Oak repo</div>
+                      </div>
+                      <div class="replica-stack">
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Replica apply</div>
+                      </div>
+                    </div>
+                    <div class="cluster-foot">Local writes for A-owned wallets enter this Aeron cluster and commit here.</div>
+                  </article>
+
+                  <article class="cluster-card">
+                    <div class="cluster-title">
+                      <strong>Cluster B</strong>
+                      <span>Prefixes 80-bf</span>
+                    </div>
+                    <div class="cluster-graph">
+                      <div class="replica-stack">
+                        <div class="replica-pill leader">Leader</div>
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Follower</div>
+                      </div>
+                      <div class="core-stack">
+                        <div class="core-node">Validator APIs</div>
+                        <div class="core-node view">Composite read view</div>
+                        <div class="core-node repo">Authoritative local Oak repo</div>
+                      </div>
+                      <div class="replica-stack">
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Replica apply</div>
+                      </div>
+                    </div>
+                    <div class="cluster-foot">B is sovereign for its own wallets. Foreign writes redirect before local queueing.</div>
+                  </article>
+
+                  <article class="cluster-card">
+                    <div class="cluster-title">
+                      <strong>Cluster C</strong>
+                      <span>Prefixes c0-ff</span>
+                    </div>
+                    <div class="cluster-graph">
+                      <div class="replica-stack">
+                        <div class="replica-pill leader">Leader</div>
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Follower</div>
+                      </div>
+                      <div class="core-stack">
+                        <div class="core-node">Validator APIs</div>
+                        <div class="core-node view">Composite read view</div>
+                        <div class="core-node repo">Authoritative local Oak repo</div>
+                      </div>
+                      <div class="replica-stack">
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Follower</div>
+                        <div class="replica-pill">Replica apply</div>
+                      </div>
+                    </div>
+                    <div class="cluster-foot">The shape scales by adding more fiefdoms, not by collapsing them into one global quorum.</div>
+                  </article>
+                </div>
+              </div>
+
+              <div class="plane-lane plane-read">
+                <div class="lane-head">
+                  <div class="lane-label">Plane 2 · Cross-cluster read fabric</div>
+                  <div class="lane-copy">The composite read view mounts foreign shard content lazily over HTTP. Remote data stays visible, but it never becomes writable local state.</div>
+                </div>
+                <div class="mount-row">
+                  <article class="mount-card">
+                    <div class="mount-title">
+                      <strong>Cluster A read view</strong>
+                      <span>Lazy read-only mounts</span>
+                    </div>
+                    <div class="mount-flow">
+                      <div class="mount-line">
+                        <span class="mount-origin">A composite view</span>
+                        <span class="arrow">→</span>
+                        <span class="mount-pill">Mount Cluster B repo for prefixes 80-bf</span>
+                      </div>
+                      <div class="mount-line">
+                        <span class="mount-origin">A composite view</span>
+                        <span class="arrow">→</span>
+                        <span class="mount-pill">Mount Cluster C repo for prefixes c0-ff</span>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article class="mount-card">
+                    <div class="mount-title">
+                      <strong>Cluster B read view</strong>
+                      <span>Lazy read-only mounts</span>
+                    </div>
+                    <div class="mount-flow">
+                      <div class="mount-line">
+                        <span class="mount-origin">B composite view</span>
+                        <span class="arrow">→</span>
+                        <span class="mount-pill">Mount Cluster A repo for prefixes 00-7f</span>
+                      </div>
+                      <div class="mount-line">
+                        <span class="mount-origin">B composite view</span>
+                        <span class="arrow">→</span>
+                        <span class="mount-pill">Mount Cluster C repo for prefixes c0-ff</span>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article class="mount-card">
+                    <div class="mount-title">
+                      <strong>Cluster C read view</strong>
+                      <span>Lazy read-only mounts</span>
+                    </div>
+                    <div class="mount-flow">
+                      <div class="mount-line">
+                        <span class="mount-origin">C composite view</span>
+                        <span class="arrow">→</span>
+                        <span class="mount-pill">Mount Cluster A repo for prefixes 00-7f</span>
+                      </div>
+                      <div class="mount-line">
+                        <span class="mount-origin">C composite view</span>
+                        <span class="arrow">→</span>
+                        <span class="mount-pill">Mount Cluster B repo for prefixes 80-bf</span>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+              </div>
+
+              <div class="plane-lane plane-discovery">
+                <div class="lane-head">
+                  <div class="lane-label">Plane 3 · Optional discovery / hint plane</div>
+                  <div class="lane-copy">Signed announcements and SSE hints can refresh route registries, prewarm remote reads, and invalidate cache, but they do not own correctness.</div>
+                </div>
+                <div class="discovery-row">
+                  <article class="discovery-card">
+                    <div class="discovery-title">
+                      <strong>Signed cluster announcements</strong>
+                      <span>Control plane</span>
+                    </div>
+                    <div class="hint-grid">
+                      <span class="hint-pill">Cluster wallet</span>
+                      <span class="hint-pill">Owned prefixes</span>
+                      <span class="hint-pill">Validator endpoints</span>
+                      <span class="hint-pill">TTL / freshness</span>
+                    </div>
+                  </article>
+
+                  <article class="discovery-card">
+                    <div class="discovery-title">
+                      <strong>SSE change hints</strong>
+                      <span>Advisory only</span>
+                    </div>
+                    <div class="hint-grid">
+                      <span class="hint-pill">Content changed</span>
+                      <span class="hint-pill">Prefix activity</span>
+                      <span class="hint-pill">Mount invalidate</span>
+                    </div>
+                  </article>
+
+                  <article class="discovery-card">
+                    <div class="discovery-title">
+                      <strong>Effect on the fabric</strong>
+                      <span>Never quorum</span>
+                    </div>
+                    <div class="hint-grid">
+                      <span class="hint-pill">Refresh route registry</span>
+                      <span class="hint-pill">Prewarm hot remote paths</span>
+                      <span class="hint-pill">Graceful cache invalidation</span>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="invariant-grid">
+          <div class="invariant">
+            <div class="cap">Invariant 1</div>
+            <strong>Writes never cross the local consensus boundary.</strong>
+            A wallet that belongs to another shard gets redirected before entering the local queue or Aeron ingress.
+          </div>
+          <div class="invariant">
+            <div class="cap">Invariant 2</div>
+            <strong>The composite view is for reads, not writes.</strong>
+            The validator can browse remote content through mounted prefixes, but merge operations still target the local authoritative store only.
+          </div>
+          <div class="invariant">
+            <div class="cap">Invariant 3</div>
+            <strong>Remote failure should degrade gracefully.</strong>
+            If a foreign cluster is unavailable, the local shard still accepts local writes and serves local content.
+          </div>
+        </div>
+
+        <div class="footer-note">
+          <strong>What the architecture is explicitly not</strong>
+          <div class="footnote">
+            It is not one super-cluster with cross-network Aeron consensus. It is not shared write authority across mounted clusters.
+            It is not remote data sneaking into the local replicated state machine. The clusters are sovereign for writes and federated for reads.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="code-anchors" class="section-card">
+      <div class="section-header">
+        <div>
+          <h2>Code Anchors</h2>
+          <p>
+            These are the live seams backing the diagrams above. The page is deliberately tied to the current codebase, not to older abstract ADR language.
+          </p>
+        </div>
+        <div class="section-badge">Live references</div>
+      </div>
+      <div class="content">
+        <div class="code-grid">
+          <div class="code-card">
+            <h3>Ingress + acceptance</h3>
+            <span class="path"><code>WriteProposalHandler.java:179-186, 791-839</code></span>
+            <p>Shard ownership is enforced before queueing. Local requests queue and return <span class="mono">202 Accepted</span> with <span class="mono">state=PENDING</span>.</p>
+          </div>
+
+          <div class="code-card">
+            <h3>Wrong-shard redirect</h3>
+            <span class="path"><code>ShardWriteAuthorityEnforcer.java:37-79</code></span>
+            <p>Remote wallets get <span class="mono">307 Temporary Redirect</span> plus redirect metadata. Unclaimed prefixes fail closed.</p>
+          </div>
+
+          <div class="code-card">
+            <h3>Pending proposal persistence</h3>
+            <span class="path"><code>ProposalQueueManagerOptimized.java:1695-1711, 1438-1488</code></span>
+            <p>The queue records the proposal, enqueues it, then persists. Persistence is async by default.</p>
+            <ul>
+              <li><code>ProposalQueueTuning.java:29-31</code> sets <span class="mono">flushIntervalMs=250</span>, <span class="mono">flushBatch=100</span>.</li>
+              <li><code>ProposalPersistenceStore.java:79-92</code> saves via temp file + atomic move.</li>
+            </ul>
+          </div>
+
+          <div class="code-card">
+            <h3>Verification and release</h3>
+            <span class="path"><code>ProposalQueueManagerOptimized.java:823-840, 2088-2145, 2288-2360</code></span>
+            <p>Verified proposals move into adaptive release and eventually call the Aeron append callback.</p>
+          </div>
+
+          <div class="code-card">
+            <h3>Aeron ordering and replica apply</h3>
+            <span class="path"><code>AeronConsensusEngine.java:780-816, 1267-1368</code></span>
+            <p>The internal cluster client offers the write through ingress. Aeron replicates it and <span class="mono">onSessionMessage</span> runs on every node.</p>
+          </div>
+
+          <div class="code-card">
+            <h3>Bridge from queue to ingress</h3>
+            <span class="path"><code>ConsensusServicesInitializer.java:197-252</code></span>
+            <p>The raft append callback forwards verified proposals into Aeron without exposing direct local mutation paths.</p>
+          </div>
+
+          <div class="code-card">
+            <h3>Write store vs read view split</h3>
+            <span class="path"><code>ServerContext.java:50-78</code></span>
+            <p>The server context keeps a composite/read-view store and a separate authoritative local store.</p>
+            <ul>
+              <li><code>ConsensusApiHandler.java:55-68</code> binds write/delete services to the authoritative store.</li>
+              <li><code>ServerStorageRuntime.java:24-66</code> carries both stores through startup.</li>
+            </ul>
+          </div>
+
+          <div class="code-card">
+            <h3>Remote mount fabric</h3>
+            <span class="path"><code>ShardingRuntimeConfig.java:32-147</code></span>
+            <p>Wallet L1 prefixes resolve local ownership and expand into remote read-only mounts.</p>
+            <ul>
+              <li><code>ValidatorReadViewBuilder.java:35-117</code> builds the composite read view.</li>
+              <li><code>LazyHttpNodeStore.java:45-248</code> provides lazy, read-only, fail-soft HTTP mounts.</li>
+              <li><code>WalletPathUtil.java:91-155</code> defines the real <span class="mono">/oak-chain/XX/YY/ZZ/0xWALLET</span> namespace.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          <strong>Current mental model to keep</strong>
+          <div class="footnote">
+            Intra-cluster: hard consensus, one writable repository, local Aeron authority. Cross-cluster: lazy mounted read fabric. Discovery and SSE can improve awareness and cache behavior later, but they should remain advisory.
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>
