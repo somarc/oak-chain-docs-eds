@@ -1,8 +1,0 @@
-index
-nav
-footer
-source
-index.md
-nav.md
-footer.md
-source.md

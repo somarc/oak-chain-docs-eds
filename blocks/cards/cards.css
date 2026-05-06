@@ -3,149 +3,25 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(257px, 1fr));
   gap: 24px;
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .cards > ul > li {
-  border: 1px solid var(--border-divider);
-  background-color: var(--bg-alt);
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  border: 1px solid #dadada;
+  background-color: var(--background-color);
 }
 
-.cards > ul > li:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(98, 126, 234, 0.15);
-  border-color: var(--border-primary);
+.cards .cards-card-body {
+  margin: 16px;
 }
 
-/* Clickable cards - entire card becomes a link */
-.cards.clickable > ul > li {
-  /* Maintain original padding and layout */
-  padding: 24px;
-  position: relative;
-}
-
-.cards.clickable .cards-card-link {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  text-decoration: none;
-  color: transparent;
-  /* Make link cover entire card but don't interfere with layout */
-}
-
-.cards.clickable .cards-card-link:hover,
-.cards.clickable .cards-card-link:focus {
-  text-decoration: none;
-  outline: none;
-}
-
-.cards.clickable .cards-card-link:focus {
-  outline: 2px solid var(--brand-primary);
-  outline-offset: -2px;
-  border-radius: 12px;
-}
-
-.cards.clickable > ul > li:hover {
-  cursor: pointer;
-}
-
-/* Ensure card content is above the link overlay */
-.cards.clickable > ul > li > * {
-  position: relative;
-  z-index: 2;
-}
-
-/* Card image/icon */
 .cards .cards-card-image {
   line-height: 0;
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
 }
 
-.cards .cards-card-image img {
+.cards > ul > li img {
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  aspect-ratio: 1 / 1;
-}
-
-/* Card body (title + description) */
-.cards .cards-card-body {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
-}
-
-/* Card title (h2, h3, or first strong element) */
-.cards .cards-card-body h2,
-.cards .cards-card-body h3,
-.cards .cards-card-body h4 {
-  margin: 0;
-  font-size: var(--heading-font-size-m);
-  font-weight: 600;
-  font-family: var(--heading-font-family);
-  color: var(--text-color);
-  line-height: 1.3;
-}
-
-/* Card description (p) */
-.cards .cards-card-body p {
-  margin: 0;
-  font-size: var(--body-font-size-s);
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-@media (width >= 900px) {
-  .cards > ul {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
-  }
-  
-  .cards > ul > li {
-    padding: 32px;
-  }
-  
-  .cards.clickable > ul > li {
-    padding: 32px; /* Maintain padding */
-  }
-  
-  .cards .cards-card-image {
-    width: 72px;
-    height: 72px;
-  }
-}
-
-@media (max-width: 899px) {
-  .cards > ul {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .cards > ul > li {
-    padding: 20px;
-  }
-  
-  .cards.clickable > ul > li {
-    padding: 20px; /* Maintain padding */
-  }
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
 }
