@@ -68,10 +68,24 @@ function buildAutoBlocks(main) {
     }
 
     buildHeroBlock(main);
+    // eslint-disable-next-line no-use-before-define
+    buildGuideSidebar(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
   }
+}
+
+/**
+ * Prepends a guide-sidebar block on any /guide/* page.
+ * @param {Element} main The container element
+ */
+function buildGuideSidebar(main) {
+  if (!window.location.pathname.startsWith('/guide')) return;
+  if (main.querySelector('.guide-sidebar')) return;
+  const section = document.createElement('div');
+  section.append(buildBlock('guide-sidebar', { elems: [] }));
+  main.prepend(section);
 }
 
 /**
