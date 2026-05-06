@@ -77,9 +77,42 @@ function dropStyleWrapperDivs(md) {
 }
 
 // Strip inline <style> blocks — Helix normalizes them out anyway, and the
-// rules they contain have been ported to styles.css.
+// rules they contain have been ported to either styles.css or block CSS.
 function stripStyleBlocks(md) {
   return md.replace(/<style>[\s\S]*?<\/style>\s*/g, '');
+}
+
+// `<div class="visual-cta-grid">…</div>` containing N `<a class="visual-cta-card">`
+// children → EDS block table with each card as its own row. The card's
+// `<strong>` becomes the headline; remaining text becomes the description.
+function replaceVisualCtaGrid(md) {
+  return md.replace(/<div class="visual-cta-grid">([\s\S]*?)<\/div>/g, (_, inner) => {
+    const cardRe = /<a class="visual-cta-card" href="([^"]+)">([\s\S]*?)<\/a>/g;
+    const rows = [];
+    let m;
+    while ((m = cardRe.exec(inner)) !== null) {
+      rows.push({ href: m[1], body: m[2].trim() });
+    }
+    if (!rows.length) return '';
+    const cells = rows.map((r) => {
+      // Body looks like: `<strong>Title</strong>\n<span>Desc</span>` — preserve.
+      return `<div>\n<div>\n<a href="${r.href}">${r.body}</a>\n</div>\n</div>`;
+    }).join('\n');
+    return `<div class="visual-cta-grid">\n${cells}\n</div>`;
+  });
+}
+
+// `<a class="action-btn">…</a>` (sometimes wrapped in a `<div style="…">`)
+// → action-btn block table.
+function replaceActionBtn(md) {
+  return md.replace(/<a([^>]*?)class="action-btn(?:\s+secondary)?"([^>]*?)>([\s\S]*?)<\/a>/g,
+    (full, before, after, text) => {
+      const isSecondary = full.includes('secondary');
+      const cls = isSecondary ? 'action-btn secondary' : 'action-btn';
+      const hrefMatch = full.match(/href="([^"]+)"/);
+      const href = hrefMatch ? hrefMatch[1] : '#';
+      return `<div class="${cls}">\n<div>\n<div>\n<a href="${href}">${text.trim()}</a>\n</div>\n</div>\n</div>`;
+    });
 }
 
 // VitePress publishes under base path /oak-chain-docs/. Strip the prefix
@@ -124,6 +157,8 @@ function convert(md) {
   content = stripStyleBlocks(content);
   content = rewriteVitePressBasePath(content);
   content = replaceVitePressContainers(content);
+  content = replaceVisualCtaGrid(content);
+  content = replaceActionBtn(content);
   content = dropStyleWrapperDivs(content);
   content = replaceFlowGraph(content);
   content = replaceMermaid(content);
