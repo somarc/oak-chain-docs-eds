@@ -36,11 +36,44 @@ function flowGraphBlock(flow) {
 }
 
 function mermaidBlock(source) {
-  const escaped = source
+  // Mermaid node labels in source MD use <br/> for line breaks. The Helix
+  // pipeline double-encodes entities inconsistently between passes, leaving
+  // mangled tokens like `&#x3C;br/>` in the rendered code block. Convert
+  // <br/> → \n (mermaid's native line break in quoted labels) before any
+  // HTML escaping so we never need to round-trip < and > as entities.
+  const normalized = source.replace(/<br\s*\/?>/gi, '\n');
+  const escaped = normalized
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
   return `<div class="mermaid">\n<div>\n<div>\n<pre><code>${escaped}</code></pre>\n</div>\n</div>\n</div>`;
+}
+
+// Marked aggressively reparses multiline content inside HTML blocks when
+// the content contains indented lines or blank-ish breaks — which mermaid
+// source frequently has. Stash mermaid blocks (and any other multiline
+// custom blocks) as placeholders before marked runs, then substitute the
+// real HTML back in. The placeholder is opaque to marked.
+function withPlaceholders(content, kind, replacer) {
+  const stash = [];
+  const re = kind === 'mermaid'
+    ? /```mermaid\n([\s\S]*?)\n```/g
+    : null;
+  if (!re) return { content, stash };
+  const replaced = content.replace(re, (_, src) => {
+    const html = replacer(src.trim());
+    stash.push(html);
+    return `\n\nPLACEHOLDER_${kind.toUpperCase()}_${stash.length - 1}\n\n`;
+  });
+  return { content: replaced, stash };
+}
+
+function restorePlaceholders(html, kind, stash) {
+  const re = new RegExp(`<p>\\s*PLACEHOLDER_${kind.toUpperCase()}_(\\d+)\\s*</p>|PLACEHOLDER_${kind.toUpperCase()}_(\\d+)`, 'g');
+  return html.replace(re, (_, a, b) => {
+    const idx = Number(a ?? b);
+    return stash[idx] ?? '';
+  });
 }
 
 function customDivBlock(cls, innerHtml) {
@@ -52,9 +85,10 @@ function replaceFlowGraph(md) {
   return md.replace(/<FlowGraph\s+flow="([\w-]+)"[^/]*\/>/g, (_, flow) => flowGraphBlock(flow));
 }
 
-// Replace ```mermaid blocks with our mermaid block markup.
+// (Mermaid is now handled via the placeholder roundtrip in convert(); this
+// function is retained as a no-op for any remaining imperative callers.)
 function replaceMermaid(md) {
-  return md.replace(/```mermaid\n([\s\S]*?)\n```/g, (_, src) => mermaidBlock(src.trim()));
+  return md;
 }
 
 // Replace <div class="X">…markdown…</div> with our block markup.
@@ -161,14 +195,25 @@ function convert(md) {
   content = replaceActionBtn(content);
   content = dropStyleWrapperDivs(content);
   content = replaceFlowGraph(content);
-  content = replaceMermaid(content);
   content = replaceCustomDivs(content);
+
+  // Stash mermaid blocks before marked runs so the multiline source can't
+  // be reparsed as nested markdown.
+  const { content: contentWithPlaceholders, stash } = withPlaceholders(
+    content, 'mermaid', mermaidBlock,
+  );
+  content = contentWithPlaceholders;
+
   // Drop horizontal rules that were used as section dividers in source —
   // we already split into sections at H2 headings.
   content = content.replace(/^\s*---\s*$/gm, '');
 
   const sectionMd = splitSections(content);
-  const sectionHtml = sectionMd.map((s) => `    <div>\n${marked.parse(s).trim().replace(/^/gm, '      ')}\n    </div>`);
+  const sectionHtml = sectionMd.map((s) => {
+    const rendered = marked.parse(s).trim();
+    const restored = restorePlaceholders(rendered, 'mermaid', stash);
+    return `    <div>\n${restored.replace(/^/gm, '      ')}\n    </div>`;
+  });
 
   return `<body>\n  <header></header>\n  <main>\n${sectionHtml.join('\n')}\n  </main>\n  <footer></footer>\n</body>\n`;
 }
