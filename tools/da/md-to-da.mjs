@@ -136,6 +136,54 @@ function replaceVisualCtaGrid(md) {
   });
 }
 
+// Marked's `<table>` output gets normalized by Helix into a div-block where
+// the first cell becomes the block class — so each table on the site
+// turns into a different one-off block (.class, .property, .tier, …) with
+// no styling. Wrap every table in a div block whose first cell literally
+// reads "Data Table" so Helix labels them all `data-table`, and rebuild
+// the row/cell structure as nested divs. The data-table block decorator
+// then renders a styled <table>.
+function wrapTablesAsDataTables(html) {
+  return html.replace(/<table>([\s\S]*?)<\/table>/g, (_, inner) => {
+    // Extract <thead>'s row(s) and <tbody>'s row(s).
+    const headRows = [];
+    const bodyRows = [];
+    const trRe = /<tr[^>]*>([\s\S]*?)<\/tr>/g;
+    let m;
+    const head = inner.match(/<thead[^>]*>([\s\S]*?)<\/thead>/);
+    const body = inner.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/);
+    if (head) {
+      while ((m = trRe.exec(head[1])) !== null) headRows.push(m[1]);
+      trRe.lastIndex = 0;
+    }
+    if (body) {
+      while ((m = trRe.exec(body[1])) !== null) bodyRows.push(m[1]);
+    } else if (!head) {
+      while ((m = trRe.exec(inner)) !== null) bodyRows.push(m[1]);
+    }
+
+    const cellsToDivs = (rowHtml) => {
+      // Convert <th> and <td> to <div>; preserve inner HTML.
+      const out = [];
+      const cellRe = /<(?:th|td)[^>]*>([\s\S]*?)<\/(?:th|td)>/g;
+      let cm;
+      while ((cm = cellRe.exec(rowHtml)) !== null) {
+        out.push(`<div>${cm[1].trim()}</div>`);
+      }
+      return out.join('');
+    };
+
+    const allRowDivs = [
+      // Title row that anchors the block class to "data-table".
+      '<div><div>Data Table</div></div>',
+      ...headRows.map((r) => `<div>${cellsToDivs(r)}</div>`),
+      ...bodyRows.map((r) => `<div>${cellsToDivs(r)}</div>`),
+    ];
+
+    return `<div class="data-table">${allRowDivs.join('')}</div>`;
+  });
+}
+
 // `<a class="action-btn">…</a>` (sometimes wrapped in a `<div style="…">`)
 // → action-btn block table.
 function replaceActionBtn(md) {
@@ -212,7 +260,8 @@ function convert(md) {
   const sectionHtml = sectionMd.map((s) => {
     const rendered = marked.parse(s).trim();
     const restored = restorePlaceholders(rendered, 'mermaid', stash);
-    return `    <div>\n${restored.replace(/^/gm, '      ')}\n    </div>`;
+    const tabled = wrapTablesAsDataTables(restored);
+    return `    <div>\n${tabled.replace(/^/gm, '      ')}\n    </div>`;
   });
 
   return `<body>\n  <header></header>\n  <main>\n${sectionHtml.join('\n')}\n  </main>\n  <footer></footer>\n</body>\n`;
