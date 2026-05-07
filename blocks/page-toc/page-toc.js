@@ -8,6 +8,8 @@
  * Skips itself + the docs-sidebar headings, only picks up content
  * headings.
  */
+import { liftAboveFooter } from '../docs-sidebar/docs-sidebar.js';
+
 function build(block) {
   const main = document.querySelector('body > main');
   if (!main) return;
@@ -57,9 +59,10 @@ function build(block) {
 
 export default function decorate(block) {
   // Run after first paint so sibling blocks have decorated.
-  if (document.readyState === 'complete') {
-    requestAnimationFrame(() => build(block));
-  } else {
-    window.addEventListener('load', () => requestAnimationFrame(() => build(block)));
-  }
+  const run = () => requestAnimationFrame(() => {
+    build(block);
+    liftAboveFooter(block);
+  });
+  if (document.readyState === 'complete') run();
+  else window.addEventListener('load', run);
 }

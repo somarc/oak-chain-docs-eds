@@ -65,6 +65,33 @@ const SECTIONS = [
   },
 ];
 
+/**
+ * Lift a fixed-positioned rail above the footer when the footer scrolls
+ * into view, so the rail never overlaps it. Reusable for any fixed-rail
+ * block (docs-sidebar, page-toc).
+ */
+export function liftAboveFooter(rail) {
+  const footer = document.querySelector('body > footer');
+  if (!footer || typeof IntersectionObserver === 'undefined') return;
+  let raf = 0;
+  const update = () => {
+    const rect = footer.getBoundingClientRect();
+    const overlap = Math.max(0, window.innerHeight - rect.top);
+    rail.style.bottom = overlap > 0 ? `${overlap}px` : '0';
+  };
+  const obs = new IntersectionObserver(() => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(update);
+  }, { threshold: [0, 0.01, 0.5, 1] });
+  obs.observe(footer);
+  window.addEventListener('scroll', () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(update);
+  }, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+}
+
 export default function decorate(block) {
   block.textContent = '';
 
@@ -102,4 +129,7 @@ export default function decorate(block) {
     group.appendChild(list);
     block.appendChild(group);
   });
+
+  // Defer until the footer fragment has loaded.
+  window.addEventListener('load', () => liftAboveFooter(block));
 }
