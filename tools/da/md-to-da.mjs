@@ -288,10 +288,14 @@ function convert(md) {
     const restored = restorePlaceholders(rendered, 'mermaid', stash);
     const tabled = wrapTablesAsDataTables(restored);
     const pictured = wrapImagesAsPictures(tabled);
-    return `    <div>\n${pictured.replace(/^/gm, '      ')}\n    </div>`;
+    // Concat without leading-line indentation. Earlier versions prettified
+    // section output with 6-space prefixes, but those spaces leak inside
+    // <pre> blocks (which preserve whitespace literally) and pollute code
+    // samples in DA's editor.
+    return `<div>${pictured}</div>`;
   });
 
-  return `<body>\n  <header></header>\n  <main>\n${sectionHtml.join('\n')}\n  </main>\n  <footer></footer>\n</body>\n`;
+  return `<body>\n  <header></header>\n  <main>${sectionHtml.join('')}</main>\n  <footer></footer>\n</body>\n`;
 }
 
 const [, , inPath, outPath] = process.argv;
