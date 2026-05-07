@@ -130,6 +130,10 @@ export default function decorate(block) {
     block.appendChild(group);
   });
 
-  // Defer until the footer fragment has loaded.
-  window.addEventListener('load', () => liftAboveFooter(block));
+  // Defer until the footer fragment has loaded. If `load` already fired
+  // (the sidebar is decorated lazily, often after window.load), call
+  // immediately — otherwise wait.
+  const lift = () => liftAboveFooter(block);
+  if (document.readyState === 'complete') lift();
+  else window.addEventListener('load', lift);
 }
