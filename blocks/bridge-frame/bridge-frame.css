@@ -1,0 +1,63 @@
+.bridge-frame {
+  border: 1px solid var(--brand-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: linear-gradient(150deg, rgb(14 19 39 / 90%), rgb(54 65 118 / 22%));
+  margin: 2rem 0;
+}
+
+.bridge-frame .bridge-frame-head,
+.bridge-frame .bridge-frame-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.bridge-frame .bridge-frame-head > div {
+  padding: 0.85rem 1.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--brand-soft);
+  border-bottom: 1px solid var(--brand-border);
+}
+
+.bridge-frame .bridge-frame-row > div {
+  padding: 1rem 1.25rem;
+  font-size: var(--body-font-size-m);
+  color: var(--text-color);
+}
+
+.bridge-frame .bridge-frame-head > div + div,
+.bridge-frame .bridge-frame-row > div + div {
+  border-left: 1px solid var(--brand-border);
+}
+
+.bridge-frame .bridge-frame-row + .bridge-frame-row > div {
+  border-top: 1px solid rgb(98 126 234 / 12%);
+}
+
+.bridge-frame .bridge-frame-old {
+  color: var(--text-muted);
+  background: rgb(26 35 72 / 30%);
+}
+
+.bridge-frame .bridge-frame-new {
+  color: var(--brand-3);
+  background: linear-gradient(145deg, rgb(76 92 176 / 18%), rgb(33 41 80 / 38%));
+  font-weight: 500;
+}
+
+@media (width <= 720px) {
+  .bridge-frame .bridge-frame-head,
+  .bridge-frame .bridge-frame-row {
+    grid-template-columns: 1fr;
+  }
+
+  .bridge-frame .bridge-frame-head > div + div,
+  .bridge-frame .bridge-frame-row > div + div {
+    border-left: 0;
+    border-top: 1px solid var(--brand-border);
+  }
+}
