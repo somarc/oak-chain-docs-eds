@@ -306,6 +306,27 @@ main > .section:first-of-type {
   }
 }
 
+/* doc-page layout: left rail + content + right rail */
+@media (width >= 1024px) {
+  body:has(.docs-sidebar) main {
+    padding-left: 280px;
+  }
+
+  body:has(.docs-sidebar) main > .section > div {
+    max-width: 880px;
+  }
+}
+
+@media (width >= 1280px) {
+  body:has(.page-toc) main {
+    padding-right: 240px;
+  }
+
+  body:has(.docs-sidebar):has(.page-toc) main > .section > div {
+    max-width: 760px;
+  }
+}
+
 /* section metadata */
 main .section.light,
 main .section.highlight {

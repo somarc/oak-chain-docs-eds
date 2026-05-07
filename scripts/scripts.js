@@ -69,7 +69,7 @@ function buildAutoBlocks(main) {
 
     buildHeroBlock(main);
     // eslint-disable-next-line no-use-before-define
-    buildGuideSidebar(main);
+    buildDocsLayout(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
@@ -77,18 +77,29 @@ function buildAutoBlocks(main) {
 }
 
 /**
- * Prepends a guide-sidebar block on any /guide/* page.
- * Only runs for the document's own main — nav and footer fragments call
- * decorateMain too, and we don't want a sidebar inside the chrome.
+ * On every doc page (everything except the homepage), inject the
+ * site-wide left-rail docs-sidebar and a right-rail page-toc.
+ *
+ * Skips fragment mains (nav, footer) so the chrome doesn't get the
+ * sidebar accidentally.
+ *
  * @param {Element} main The container element
  */
-function buildGuideSidebar(main) {
-  if (!window.location.pathname.startsWith('/guide')) return;
+function buildDocsLayout(main) {
   if (main !== document.querySelector('body > main')) return;
-  if (main.querySelector('.guide-sidebar')) return;
-  const section = document.createElement('div');
-  section.append(buildBlock('guide-sidebar', { elems: [] }));
-  main.prepend(section);
+  const path = window.location.pathname;
+  if (path === '/' || path === '/index') return;
+
+  if (!main.querySelector('.docs-sidebar')) {
+    const section = document.createElement('div');
+    section.append(buildBlock('docs-sidebar', { elems: [] }));
+    main.prepend(section);
+  }
+  if (!main.querySelector('.page-toc')) {
+    const section = document.createElement('div');
+    section.append(buildBlock('page-toc', { elems: [] }));
+    main.append(section);
+  }
 }
 
 /**

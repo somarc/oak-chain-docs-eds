@@ -1,18 +1,30 @@
 /**
- * Guide Sidebar block.
+ * Docs Sidebar block.
  *
- * Renders a fixed left-rail navigation listing every page in /guide/.
- * Auto-injected by scripts.js on any pathname starting with /guide/. The
- * current page is highlighted. Hidden on narrow viewports via CSS.
+ * Site-wide left-rail navigation for every doc page. Mirrors the
+ * VitePress sidebar IA. Auto-injected by scripts.js on every page
+ * except the homepage. Highlights the current page with a brand-bar
+ * border and brand-soft background.
  */
 
 const SECTIONS = [
   {
-    title: 'Start Here',
+    title: 'Why Oak Chain',
     items: [
+      { href: '/thesis', label: 'The Thesis' },
+      { href: '/bull-case', label: 'Bull Case' },
+      { href: '/faq', label: 'FAQ' },
+    ],
+  },
+  {
+    title: 'Understanding',
+    items: [
+      { href: '/how-it-works', label: 'How It Works' },
+      { href: '/architecture', label: 'Architecture' },
+      { href: '/architecture-system-map', label: 'System Map' },
+      { href: '/write-flow-and-content-fabric', label: 'Write Flow + Fabric' },
+      { href: '/project-composition', label: 'Project Composition' },
       { href: '/guide/', label: 'Quick Start' },
-      { href: '/guide/auth', label: 'Authentication' },
-      { href: '/guide/api', label: 'API Reference' },
     ],
   },
   {
@@ -24,20 +36,31 @@ const SECTIONS = [
       { href: '/guide/economics', label: 'Economic Tiers' },
       { href: '/guide/paths', label: 'Content Paths' },
       { href: '/guide/content-consumption', label: 'Content Consumption' },
-    ],
-  },
-  {
-    title: 'Storage & Streaming',
-    items: [
       { href: '/guide/binaries', label: 'Binary Storage' },
       { href: '/guide/streaming', label: 'Real-Time Streaming' },
+      { href: '/segment-gc', label: 'Segment Store GC' },
     ],
   },
   {
-    title: 'Integration',
+    title: 'Developer Guide',
     items: [
+      { href: '/guide/api', label: 'API Reference' },
+      { href: '/guide/auth', label: 'Authentication' },
       { href: '/guide/aem-integration', label: 'AEM Integration' },
       { href: '/guide/testnet', label: 'Testnet Guide' },
+    ],
+  },
+  {
+    title: 'For Operators',
+    items: [
+      { href: '/operators/', label: 'Running a Validator' },
+    ],
+  },
+  {
+    title: 'Resources',
+    items: [
+      { href: '/changelog', label: 'Changelog' },
+      { href: '/contributing', label: 'Contributing' },
     ],
   },
 ];
@@ -45,19 +68,20 @@ const SECTIONS = [
 export default function decorate(block) {
   block.textContent = '';
 
-  const heading = document.createElement('div');
-  heading.className = 'guide-sidebar-heading';
-  heading.textContent = 'Developer Guide';
+  const heading = document.createElement('a');
+  heading.href = '/';
+  heading.className = 'docs-sidebar-heading';
+  heading.textContent = 'Oak Chain Docs';
   block.appendChild(heading);
 
   const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
 
   SECTIONS.forEach((section) => {
     const group = document.createElement('div');
-    group.className = 'guide-sidebar-group';
+    group.className = 'docs-sidebar-group';
 
     const label = document.createElement('div');
-    label.className = 'guide-sidebar-label';
+    label.className = 'docs-sidebar-label';
     label.textContent = section.title;
     group.appendChild(label);
 
