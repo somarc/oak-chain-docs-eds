@@ -117,7 +117,7 @@ export default async function decorate(block) {
   }
 
   function close() {
-    root.classList.remove('search-open');
+    block.classList.remove('search-open');
     input.setAttribute('aria-expanded', 'false');
     input.removeAttribute('aria-activedescendant');
     activeIdx = -1;
@@ -162,7 +162,7 @@ export default async function decorate(block) {
         listbox.append(li);
       });
     }
-    root.classList.add('search-open');
+    block.classList.add('search-open');
     input.setAttribute('aria-expanded', 'true');
   }
 
@@ -175,7 +175,7 @@ export default async function decorate(block) {
   input.addEventListener('focus', () => {
     loadIndex();
     if (input.value.trim().length >= MIN_QUERY_LEN) {
-      root.classList.add('search-open');
+      block.classList.add('search-open');
       input.setAttribute('aria-expanded', 'true');
     }
   });
@@ -201,7 +201,7 @@ export default async function decorate(block) {
   });
 
   document.addEventListener('click', (e) => {
-    if (!root.contains(e.target)) close();
+    if (!block.contains(e.target)) close();
   });
 
   document.addEventListener('keydown', (e) => {
