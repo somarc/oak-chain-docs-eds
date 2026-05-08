@@ -45,6 +45,7 @@ const SECTIONS = [
     title: 'Developer Guide',
     items: [
       { href: '/guide/api', label: 'API Reference' },
+      { href: '/guide/surface-catalog', label: 'Surface Catalog' },
       { href: '/guide/auth', label: 'Authentication' },
       { href: '/guide/aem-integration', label: 'AEM Integration' },
       { href: '/guide/testnet', label: 'Testnet Guide' },
