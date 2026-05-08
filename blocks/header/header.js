@@ -1,4 +1,4 @@
-import { getMetadata } from '../../scripts/aem.js';
+import { getMetadata, loadCSS } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
 // media query match that indicates mobile/tablet width
@@ -163,6 +163,17 @@ export default async function decorate(block) {
   // prevent mobile nav behavior on window resize
   toggleMenu(nav, navSections, isDesktop.matches);
   isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+
+  const navTools = nav.querySelector('.nav-tools');
+  if (navTools) {
+    const searchBlock = document.createElement('div');
+    searchBlock.className = 'search';
+    navTools.prepend(searchBlock);
+    Promise.all([
+      import('../search/search.js'),
+      loadCSS(`${window.hlx.codeBasePath}/blocks/search/search.css`),
+    ]).then(([{ default: decorateSearch }]) => decorateSearch(searchBlock));
+  }
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';

@@ -269,4 +269,22 @@ header nav .nav-sections ul > li > ul > li {
 /* tools */
 header nav .nav-tools {
   grid-area: tools;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+header nav .nav-tools .search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (width >= 900px) {
+  header nav .nav-tools {
+    flex: 0 0 auto;
+  }
+
+  header nav .nav-tools .search {
+    flex: 0 0 240px;
+  }
 }
