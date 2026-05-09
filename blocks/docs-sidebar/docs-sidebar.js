@@ -24,7 +24,7 @@ const SECTIONS = [
       { href: '/architecture-system-map', label: 'System Map' },
       { href: '/write-flow-and-content-fabric', label: 'Write Flow + Fabric' },
       { href: '/project-composition', label: 'Project Composition' },
-      { href: '/guide/', label: 'Quick Start' },
+      { href: '/guide/quickstart', label: 'Quickstart' },
     ],
   },
   {
@@ -44,6 +44,8 @@ const SECTIONS = [
   {
     title: 'Developer Guide',
     items: [
+      { href: '/guide/', label: 'Guide Overview' },
+      { href: '/guide/quickstart', label: 'Quickstart' },
       { href: '/guide/api', label: 'API Reference' },
       { href: '/guide/surface-catalog', label: 'Surface Catalog' },
       { href: '/guide/smart-contract', label: 'Smart Contract' },
