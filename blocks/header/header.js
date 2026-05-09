@@ -173,6 +173,14 @@ export default async function decorate(block) {
       import('../search/search.js'),
       loadCSS(`${window.hlx.codeBasePath}/blocks/search/search.css`),
     ]).then(([{ default: decorateSearch }]) => decorateSearch(searchBlock));
+
+    const tickerBlock = document.createElement('div');
+    tickerBlock.className = 'eth-ticker';
+    navTools.prepend(tickerBlock);
+    Promise.all([
+      import('../eth-ticker/eth-ticker.js'),
+      loadCSS(`${window.hlx.codeBasePath}/blocks/eth-ticker/eth-ticker.css`),
+    ]).then(([{ default: decorateTicker }]) => decorateTicker(tickerBlock));
   }
 
   const navWrapper = document.createElement('div');

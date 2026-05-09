@@ -285,6 +285,11 @@ header nav .nav-tools .search {
   }
 
   header nav .nav-tools .search {
-    flex: 0 0 240px;
+    flex: 0 0 220px;
   }
+}
+
+header nav .nav-tools .eth-ticker {
+  flex: 0 0 auto;
+  order: -1;
 }
