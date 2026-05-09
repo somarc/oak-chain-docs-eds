@@ -151,6 +151,45 @@ const RULES = [
     },
   },
   {
+    id: 'v3-conceptual-residue',
+    severity: 'warn',
+    label: 'V3-era conceptual framing',
+    note: 'V5 settles via on-chain ProposalSettledV5 events. "payment proof", "payment verifier", "payment verification" are V3-era phrasings. V5 has settlement events, not payment proofs.',
+    test: (html) => {
+      const hits = [];
+      const patterns = [
+        /\bpayment proof(s)?\b/gi,
+        /\bpayment verifier\b/gi,
+        /\bpayment verification\b/gi,
+      ];
+      for (const p of patterns) {
+        const m = html.match(p);
+        if (m) hits.push(`${p.source}: ${m.length}`);
+      }
+      return hits;
+    },
+  },
+  {
+    id: 'beacon-chain-residue',
+    severity: 'warn',
+    label: 'Beacon Chain reference (V3-era)',
+    note: 'V5 validators just need standard JSON-RPC for event watching. Beacon Chain dependency was V3-era. Allowed only when explicitly justifying finality semantics.',
+    test: (html) => {
+      const m = html.match(/[Bb]eacon\s+[Cc]hain|beacon-chain/g);
+      return m ? [`${m.length} reference(s)`] : [];
+    },
+  },
+  {
+    id: 'ethereum-epoch-residue',
+    severity: 'info',
+    label: 'Ethereum epoch reference',
+    note: '"Ethereum epoch" is a Beacon Chain term. V5 cares about confirmation depth or finality, not epochs specifically. Confirm context before keeping.',
+    test: (html) => {
+      const m = html.match(/Ethereum\s+epoch(s)?|epoch trigger|epoch finalization/gi);
+      return m ? [`${m.length} reference(s)`] : [];
+    },
+  },
+  {
     id: 'oak-segment-naming',
     severity: 'info',
     label: 'oak-segment-http used without oak-segment-gossip',
