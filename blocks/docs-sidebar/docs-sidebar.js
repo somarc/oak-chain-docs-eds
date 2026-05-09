@@ -60,13 +60,6 @@ const SECTIONS = [
       { href: '/operators/', label: 'Running a Validator' },
     ],
   },
-  {
-    title: 'Resources',
-    items: [
-      { href: '/changelog', label: 'Changelog' },
-      { href: '/contributing', label: 'Contributing' },
-    ],
-  },
 ];
 
 /**
