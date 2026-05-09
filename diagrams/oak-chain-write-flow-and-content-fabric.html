@@ -1270,7 +1270,7 @@
                     <div class="main-stage pending">
                       <div class="stage-kicker">4 · Verification</div>
                       <strong>Wait for payment proof and release</strong>
-                      <p>The verifier confirms payment and moves the proposal into adaptive release / append-ready state.</p>
+                      <p>The verifier confirms a <span class="mono">ProposalSettledV5</span> event for the proposal id on <span class="mono">ValidatorPaymentV5</span> (one contract per Aeron cluster), then moves the proposal into adaptive release / append-ready state.</p>
                     </div>
                     <div class="main-stage quorum">
                       <div class="stage-kicker">5 · Aeron ingress</div>
@@ -1340,7 +1340,7 @@
           <div class="step local">
             <div class="number">4</div>
             <h4>Verified</h4>
-            <p>The payment proof resolves and the proposal moves into adaptive release / ready-to-append flow.</p>
+            <p>The on-chain <span class="mono">ProposalSettledV5</span> event resolves and the proposal moves into adaptive release / ready-to-append flow.</p>
           </div>
           <div class="step quorum">
             <div class="number">5</div>
@@ -1388,7 +1388,7 @@
           </div>
           <div class="fact">
             <h3>Remote mounts stay outside quorum</h3>
-            <p>Foreign shard content is exposed through <span class="mono">LazyHttpNodeStore</span> and never becomes part of local consensus state.</p>
+            <p>Foreign shard content is exposed through <span class="mono">LazyHttpNodeStore</span> (the implementation surface for the canonical <span class="mono">oak-segment-gossip</span> protocol) and never becomes part of local consensus state.</p>
           </div>
           <div class="fact">
             <h3>Authority is prefix-scoped</h3>
