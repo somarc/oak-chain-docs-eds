@@ -49,10 +49,12 @@ if (!putRes.ok) {
   process.exit(1);
 }
 
-// Helix preview trigger: only meaningful for routable HTML pages.
-// Strip the .html extension; use the same web path the page is served at.
+// Helix preview + live triggers: only meaningful for routable HTML pages.
+// Preview alone keeps content on .aem.page; without the live trigger, the
+// public .aem.live URL keeps serving the previously-published version.
 if (isHtml) {
   const webPath = daPath.replace(/\.html$/, '').replace(/^index$/, '');
+
   const previewUrl = `https://admin.hlx.page/preview/${ORG}/${REPO}/main/${webPath}`;
   const prevRes = await fetch(previewUrl, {
     method: 'POST',
@@ -61,5 +63,15 @@ if (isHtml) {
   console.log(`PREV /${webPath} -> ${prevRes.status}`);
   if (!prevRes.ok) {
     console.log(await prevRes.text());
+  }
+
+  const liveUrl = `https://admin.hlx.page/live/${ORG}/${REPO}/main/${webPath}`;
+  const liveRes = await fetch(liveUrl, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${TOKEN}` },
+  });
+  console.log(`LIVE /${webPath} -> ${liveRes.status}`);
+  if (!liveRes.ok) {
+    console.log(await liveRes.text());
   }
 }
