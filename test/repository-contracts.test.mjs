@@ -73,5 +73,6 @@ test('eager rendering avoids known PSI regressions', () => {
   assert.match(styles, /\.mermaid\.state/);
   assert.match(styles, /\.picture\.system-map/);
   assert.match(scripts, /decorateScrollableRegions/);
+  assert.match(scripts, /Keep authored content first[\s\S]*main\.append\(section\)/);
   assert.doesNotMatch(video, /video\.poster/);
 });

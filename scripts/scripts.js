@@ -82,7 +82,9 @@ function buildDocsLayout(main) {
   if (!main.querySelector('.docs-sidebar')) {
     const section = document.createElement('div');
     section.append(buildBlock('docs-sidebar', { elems: [] }));
-    main.prepend(section);
+    // Keep authored content first so the real page LCP section owns eager load.
+    // The rail is fixed-positioned, so DOM placement does not affect its visual position.
+    main.append(section);
   }
   if (!main.querySelector('.page-toc')) {
     const section = document.createElement('div');
