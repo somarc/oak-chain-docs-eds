@@ -53,8 +53,9 @@ function navSections(fragment) {
       .filter(Boolean)
       .map((anchor) => ({ href: anchor.getAttribute('href'), label: anchor.textContent.trim() }));
 
-    if (link?.getAttribute('href') && link.getAttribute('href') !== '#') {
-      items.unshift({ href: link.getAttribute('href'), label: `${link.textContent.trim()} overview` });
+    const overviewHref = link?.getAttribute('href');
+    if (overviewHref && overviewHref !== '#' && !items.some((entry) => entry.href === overviewHref)) {
+      items.unshift({ href: overviewHref, label: `${link.textContent.trim()} overview` });
     }
     if (items.length) sections.push({ title: link?.textContent.trim() || 'Documentation', items });
   });
