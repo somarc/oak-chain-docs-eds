@@ -62,3 +62,16 @@ test('live publication remains x402-gated', () => {
   assert.match(gate, /PAYMENT-REQUIRED/);
   assert.match(gate, /Existing live site must remain unchanged/i);
 });
+
+test('eager rendering avoids known PSI regressions', () => {
+  const head = read('head.html');
+  const styles = read('styles/styles.css');
+  const scripts = read('scripts/scripts.js');
+  const video = read('blocks/video-hero/video-hero.js');
+  assert.doesNotMatch(head, /fonts\.(?:googleapis|gstatic)\.com/);
+  assert.match(head, /docs-page/);
+  assert.match(styles, /\.mermaid\.state/);
+  assert.match(styles, /\.picture\.system-map/);
+  assert.match(scripts, /decorateScrollableRegions/);
+  assert.doesNotMatch(video, /video\.poster/);
+});

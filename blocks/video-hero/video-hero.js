@@ -66,7 +66,6 @@ export default function decorate(block) {
     video.loop = true;
     video.playsInline = true;
     video.preload = 'none';
-    video.poster = '/default-meta-image.png';
     video.setAttribute('aria-hidden', 'true');
     video.tabIndex = -1;
 

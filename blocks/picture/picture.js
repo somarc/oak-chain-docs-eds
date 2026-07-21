@@ -17,7 +17,24 @@
  *
  * Empty cells are skipped; positional intent is preserved.
  */
-export default function decorate(block) {
+async function svgDimensions(src) {
+  if (!src.toLowerCase().split(/[?#]/)[0].endsWith('.svg')) return null;
+  try {
+    const response = await fetch(src);
+    if (!response.ok) return null;
+    const source = await response.text();
+    const viewBox = source.match(/viewBox=["']\s*[\d.-]+\s+[\d.-]+\s+([\d.]+)\s+([\d.]+)["']/i);
+    if (viewBox) return { width: Number(viewBox[1]), height: Number(viewBox[2]) };
+    const width = source.match(/<svg[^>]*\bwidth=["']([\d.]+)["']/i);
+    const height = source.match(/<svg[^>]*\bheight=["']([\d.]+)["']/i);
+    if (width && height) return { width: Number(width[1]), height: Number(height[1]) };
+  } catch (error) {
+    // The image still renders without intrinsic dimensions if metadata probing fails.
+  }
+  return null;
+}
+
+export default async function decorate(block) {
   const cells = [...block.querySelectorAll(':scope > div > div')];
   const text = (i) => cells[i]?.textContent.trim() || '';
   const linkOf = (i) => cells[i]?.querySelector('a')?.getAttribute('href') || '';
@@ -30,6 +47,8 @@ export default function decorate(block) {
   const href = linkOf(2);
   const caption = captionOf(3);
 
+  const dimensions = await svgDimensions(src);
+
   block.textContent = '';
   if (!src) return;
 
@@ -39,6 +58,11 @@ export default function decorate(block) {
   img.src = src;
   img.alt = alt;
   img.loading = 'lazy';
+  img.decoding = 'async';
+  if (dimensions) {
+    img.width = dimensions.width;
+    img.height = dimensions.height;
+  }
 
   if (href) {
     const a = document.createElement('a');

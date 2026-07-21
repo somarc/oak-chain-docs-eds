@@ -56,6 +56,11 @@ export default async function decorate(block) {
   const source = (code?.textContent || block.textContent || '').trim();
   if (!source) return;
 
+  const diagramType = source.split(/\s|\n/, 1)[0].toLowerCase();
+  if (diagramType.startsWith('sequence')) block.classList.add('sequence');
+  else if (diagramType.startsWith('state')) block.classList.add('state');
+  else if (/^(?:graph|flowchart)$/.test(diagramType)) block.classList.add('wide');
+
   block.textContent = '';
   const stage = document.createElement('div');
   stage.className = 'mermaid-stage';

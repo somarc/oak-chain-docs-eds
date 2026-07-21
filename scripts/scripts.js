@@ -130,6 +130,12 @@ function decorateButtons(main) {
   });
 }
 
+function decorateScrollableRegions(main) {
+  main.querySelectorAll('pre').forEach((pre) => {
+    pre.tabIndex = 0;
+  });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -141,6 +147,7 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
+  decorateScrollableRegions(main);
 }
 
 /**

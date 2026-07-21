@@ -40,9 +40,9 @@
   --divider-color: rgb(98 126 234 / 10%);
 
   /* fonts */
-  --body-font-family: inter, -apple-system, blinkmacsystemfont, sans-serif;
-  --heading-font-family: inter, -apple-system, blinkmacsystemfont, sans-serif;
-  --mono-font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  --body-font-family: -apple-system, blinkmacsystemfont, 'Segoe UI', sans-serif;
+  --heading-font-family: -apple-system, blinkmacsystemfont, 'Segoe UI', sans-serif;
+  --mono-font-family: ui-monospace, 'SFMono-Regular', menlo, monaco, consolas, monospace;
 
   /* body sizes */
   --body-font-size-m: 17px;
@@ -168,6 +168,11 @@ pre {
   overflow-x: auto;
   white-space: pre;
   color: var(--text-color);
+}
+
+pre:focus-visible {
+  outline: 3px solid var(--brand-3);
+  outline-offset: 3px;
 }
 
 main > div {
@@ -333,22 +338,63 @@ main > .section:first-of-type {
 
 /* doc-page layout: left rail + content + right rail */
 @media (width >= 1024px) {
-  body:has(.docs-sidebar) main {
+  html.docs-page main {
     padding-left: 280px;
   }
 
-  body:has(.docs-sidebar) main > .section > div {
+  html.docs-page main > .section > div {
     max-width: 880px;
   }
 }
 
 @media (width >= 1280px) {
-  body:has(.page-toc) main {
+  html.docs-page main {
     padding-right: 240px;
   }
 
-  body:has(.docs-sidebar):has(.page-toc) main > .section > div {
+  html.docs-page main > .section > div {
     max-width: 760px;
+  }
+}
+
+/* Reserve authored visual space before lazy block decoration to prevent CLS. */
+main .flow-graph {
+  min-height: 240px;
+}
+
+main .mermaid.sequence {
+  min-height: 170px;
+}
+
+main .mermaid.state {
+  min-height: 400px;
+}
+
+main .mermaid.wide {
+  min-height: 190px;
+}
+
+main .picture.system-map {
+  width: min(100%, 800px);
+  aspect-ratio: 1600 / 1320;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+main .picture.landscape {
+  width: min(100%, 800px);
+  aspect-ratio: 7 / 4;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (width >= 900px) {
+  main .flow-graph {
+    min-height: 420px;
+  }
+
+  main .mermaid.sequence {
+    min-height: 300px;
   }
 }
 
