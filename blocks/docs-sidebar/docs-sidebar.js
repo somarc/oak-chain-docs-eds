@@ -29,7 +29,7 @@ export function liftAboveFooter(rail) {
 }
 
 function directLink(item) {
-  return [...item.children].find((child) => child.tagName === 'A') || null;
+  return item.querySelector(':scope > p > a, :scope > a');
 }
 
 function navSections(fragment) {

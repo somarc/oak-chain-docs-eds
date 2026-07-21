@@ -8,7 +8,7 @@ function setDropdownExpanded(toggle, expanded) {
   if (!item) return;
   item.dataset.expanded = String(expanded);
   toggle.setAttribute('aria-expanded', String(expanded));
-  const label = item.querySelector(':scope > a')?.textContent.trim() || 'navigation';
+  const label = item.querySelector(':scope > p > a, :scope > a')?.textContent.trim() || 'navigation';
   toggle.setAttribute('aria-label', `${expanded ? 'Close' : 'Open'} ${label} menu`);
 }
 
