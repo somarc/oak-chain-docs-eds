@@ -1,71 +1,10 @@
-/**
- * Docs Sidebar block.
- *
- * Site-wide left-rail navigation for every doc page. Mirrors the
- * VitePress sidebar IA. Auto-injected by scripts.js on every page
- * except the homepage. Highlights the current page with a brand-bar
- * border and brand-soft background.
- */
-
-const SECTIONS = [
-  {
-    title: 'Why Oak Chain',
-    items: [
-      { href: '/thesis', label: 'The Thesis' },
-      { href: '/bull-case', label: 'Bull Case' },
-      { href: '/faq', label: 'FAQ' },
-    ],
-  },
-  {
-    title: 'Understanding',
-    items: [
-      { href: '/how-it-works', label: 'How It Works' },
-      { href: '/architecture', label: 'Architecture' },
-      { href: '/architecture-system-map', label: 'System Map' },
-      { href: '/write-flow-and-content-fabric', label: 'Write Flow + Fabric' },
-      { href: '/project-composition', label: 'Project Composition' },
-      { href: '/guide/quickstart', label: 'Quickstart' },
-    ],
-  },
-  {
-    title: 'Core Concepts',
-    items: [
-      { href: '/guide/consensus', label: 'Consensus Model' },
-      { href: '/guide/proposal-flow', label: 'Proposal Flow' },
-      { href: '/guide/primary-signals', label: 'Primary Signals' },
-      { href: '/guide/economics', label: 'Economic Tiers' },
-      { href: '/guide/paths', label: 'Content Paths' },
-      { href: '/guide/content-consumption', label: 'Content Consumption' },
-      { href: '/guide/binaries', label: 'Binary Storage' },
-      { href: '/guide/streaming', label: 'Real-Time Streaming' },
-      { href: '/segment-gc', label: 'Segment Store GC' },
-    ],
-  },
-  {
-    title: 'Developer Guide',
-    items: [
-      { href: '/guide/', label: 'Guide Overview' },
-      { href: '/guide/quickstart', label: 'Quickstart' },
-      { href: '/guide/api', label: 'API Reference' },
-      { href: '/guide/surface-catalog', label: 'Surface Catalog' },
-      { href: '/guide/smart-contract', label: 'Smart Contract' },
-      { href: '/guide/auth', label: 'Authentication' },
-      { href: '/guide/aem-integration', label: 'AEM Integration' },
-      { href: '/guide/testnet', label: 'Testnet Guide' },
-    ],
-  },
-  {
-    title: 'For Operators',
-    items: [
-      { href: '/operators/', label: 'Running a Validator' },
-    ],
-  },
-];
+import { getMetadata } from '../../scripts/aem.js';
+import { loadFragment } from '../fragment/fragment.js';
 
 /**
- * Lift a fixed-positioned rail above the footer when the footer scrolls
- * into view, so the rail never overlaps it. Reusable for any fixed-rail
- * block (docs-sidebar, page-toc).
+ * Lift a fixed-positioned rail above the footer when the footer scrolls into
+ * view, so the rail never overlaps it. Reused by the sidebar and page TOC.
+ * @param {Element} rail Fixed rail element
  */
 export function liftAboveFooter(rail) {
   const footer = document.querySelector('body > footer');
@@ -89,48 +28,102 @@ export function liftAboveFooter(rail) {
   update();
 }
 
-export default function decorate(block) {
-  block.textContent = '';
+function directLink(item) {
+  return [...item.children].find((child) => child.tagName === 'A') || null;
+}
 
-  const heading = document.createElement('a');
-  heading.href = '/';
-  heading.className = 'docs-sidebar-heading';
-  heading.textContent = 'Oak Chain Docs';
-  block.appendChild(heading);
+function navSections(fragment) {
+  const rootList = fragment.querySelector('ul');
+  if (!rootList) return [];
+  const flatItems = [];
+  const sections = [];
 
+  [...rootList.children].forEach((item) => {
+    if (item.tagName !== 'LI') return;
+    const link = directLink(item);
+    const nested = [...item.children].find((child) => child.tagName === 'UL');
+    if (!nested) {
+      if (link) flatItems.push({ href: link.getAttribute('href'), label: link.textContent.trim() });
+      return;
+    }
+
+    const items = [...nested.children]
+      .filter((child) => child.tagName === 'LI')
+      .map((child) => child.querySelector('a[href]'))
+      .filter(Boolean)
+      .map((anchor) => ({ href: anchor.getAttribute('href'), label: anchor.textContent.trim() }));
+
+    if (link?.getAttribute('href') && link.getAttribute('href') !== '#') {
+      items.unshift({ href: link.getAttribute('href'), label: `${link.textContent.trim()} overview` });
+    }
+    if (items.length) sections.push({ title: link?.textContent.trim() || 'Documentation', items });
+  });
+
+  if (flatItems.length) sections.unshift({ title: 'Documentation', items: flatItems });
+  return sections;
+}
+
+function renderSections(block, sections) {
   const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
-
-  SECTIONS.forEach((section) => {
+  sections.forEach((section) => {
     const group = document.createElement('div');
     group.className = 'docs-sidebar-group';
 
     const label = document.createElement('div');
     label.className = 'docs-sidebar-label';
     label.textContent = section.title;
-    group.appendChild(label);
+    group.append(label);
 
     const list = document.createElement('ul');
     section.items.forEach((item) => {
       const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = item.href;
-      a.textContent = item.label;
-      const itemPath = item.href.replace(/\/$/, '') || '/';
+      const anchor = document.createElement('a');
+      anchor.href = item.href;
+      anchor.textContent = item.label;
+      const itemPath = new URL(anchor.href, window.location.href).pathname.replace(/\/$/, '') || '/';
       if (itemPath === currentPath) {
         li.classList.add('current');
-        a.setAttribute('aria-current', 'page');
+        anchor.setAttribute('aria-current', 'page');
       }
-      li.appendChild(a);
-      list.appendChild(li);
+      li.append(anchor);
+      list.append(li);
     });
-    group.appendChild(list);
-    block.appendChild(group);
+    group.append(list);
+    block.append(group);
   });
+}
 
-  // Defer until the footer fragment has loaded. If `load` already fired
-  // (the sidebar is decorated lazily, often after window.load), call
-  // immediately — otherwise wait.
+/**
+ * Builds the docs rail from the same DA-authored fragment as the primary nav.
+ * Presentation stays in code; labels, routes and hierarchy remain in DA.
+ * @param {Element} block Sidebar block
+ */
+export default async function decorate(block) {
+  block.textContent = '';
+
+  const heading = document.createElement('a');
+  heading.href = '/';
+  heading.className = 'docs-sidebar-heading';
+  heading.textContent = 'Oak Chain Docs';
+  block.append(heading);
+
+  try {
+    const navMeta = getMetadata('nav');
+    const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+    const fragment = await loadFragment(navPath);
+    const sections = navSections(fragment);
+    if (!sections.length) throw new Error('Shared navigation has no documentation links');
+    renderSections(block, sections);
+  } catch (error) {
+    const fallback = document.createElement('p');
+    const link = document.createElement('a');
+    link.href = '/guide/';
+    link.textContent = 'Browse the developer guide';
+    fallback.append(link);
+    block.append(fallback);
+  }
+
   const lift = () => liftAboveFooter(block);
   if (document.readyState === 'complete') lift();
-  else window.addEventListener('load', lift);
+  else window.addEventListener('load', lift, { once: true });
 }

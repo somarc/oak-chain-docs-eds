@@ -17,9 +17,12 @@
  * on pages that don't need it.
  */
 
-const MERMAID_CDN = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+const MERMAID_VERSION = '11.16.0';
+const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.esm.min.mjs`;
 const THEME = {
   startOnLoad: false,
+  securityLevel: 'strict',
+  suppressErrorRendering: true,
   theme: 'dark',
   themeVariables: {
     primaryColor: '#627EEA',

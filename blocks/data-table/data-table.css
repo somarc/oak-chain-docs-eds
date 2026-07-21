@@ -3,6 +3,12 @@
   overflow-x: auto;
 }
 
+.data-table:focus-visible {
+  border-radius: 8px;
+  outline: 3px solid var(--brand-3);
+  outline-offset: 4px;
+}
+
 .data-table table {
   width: 100%;
   border-collapse: collapse;

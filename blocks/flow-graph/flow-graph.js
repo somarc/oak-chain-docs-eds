@@ -13,24 +13,24 @@
  */
 
 const NODE_TYPES = {
-  USER: { icon: '👤', color: '#627EEA' },
-  WALLET: { icon: '👛', color: '#f0b429' },
-  AUTHOR: { icon: '✍️', color: '#8C8DFC' },
-  VALIDATOR: { icon: '⚡', color: '#4ade80' },
-  CONSENSUS: { icon: '🔄', color: '#627EEA' },
-  OAK_STORE: { icon: '🌳', color: '#4ade80' },
+  USER: { icon: 'U', color: '#627EEA' },
+  WALLET: { icon: 'W', color: '#f0b429' },
+  AUTHOR: { icon: 'A', color: '#8C8DFC' },
+  VALIDATOR: { icon: 'V', color: '#4ade80' },
+  CONSENSUS: { icon: 'C', color: '#627EEA' },
+  OAK_STORE: { icon: 'O', color: '#4ade80' },
   ETHEREUM: { icon: '⟠', color: '#627EEA' },
-  CONTRACT: { icon: '📜', color: '#f85149' },
-  IPFS: { icon: '🌐', color: '#65c2cb' },
-  SEGMENT: { icon: '📦', color: '#8b949e' },
-  CONTENT: { icon: '📄', color: '#e6edf3' },
-  SIGNATURE: { icon: '🔐', color: '#f0b429' },
-  TRANSACTION: { icon: '💸', color: '#4ade80' },
-  AEM: { icon: '🏢', color: '#fa0f00' },
-  CDN: { icon: '🌍', color: '#f48120' },
-  PASSKEY: { icon: '🔑', color: '#a855f7' },
-  EDS: { icon: '⚡', color: '#00c7b7' },
-  AZURE: { icon: '☁️', color: '#0078d4' },
+  CONTRACT: { icon: 'SC', color: '#f85149' },
+  IPFS: { icon: 'IP', color: '#65c2cb' },
+  SEGMENT: { icon: 'S', color: '#8b949e' },
+  CONTENT: { icon: 'D', color: '#e6edf3' },
+  SIGNATURE: { icon: 'SIG', color: '#f0b429' },
+  TRANSACTION: { icon: 'TX', color: '#4ade80' },
+  AEM: { icon: 'AEM', color: '#fa0f00' },
+  CDN: { icon: 'CDN', color: '#f48120' },
+  PASSKEY: { icon: 'PK', color: '#a855f7' },
+  EDS: { icon: 'EDS', color: '#00c7b7' },
+  AZURE: { icon: 'AZ', color: '#0078d4' },
 };
 
 const EDGE_COLORS = {
@@ -94,7 +94,7 @@ const FLOWS = {
       ['http', 'CONSENSUS', 400, 180, 'oak-segment-http', 'HTTP persistence layer'],
       ['validators', 'VALIDATOR', 580, 180, 'Validators', 'Raft consensus cluster'],
       ['oakchain', 'OAK_STORE', 580, 80, '/oak-chain (remote)', 'Read-only blockchain content'],
-      ['ethereum', 'ETHEREUM', 750, 180, 'Ethereum', 'Payment verification'],
+      ['ethereum', 'ETHEREUM', 750, 180, 'Ethereum', 'Settlement authorization'],
     ],
     edges: [
       ['aem', 'composite', 'DATA', 'JCR API'],
@@ -233,7 +233,7 @@ const FLOWS = {
       ['validator2', 'VALIDATOR', 220, 180, 'Validator 2', 'Raft consensus node (Follower)'],
       ['validator3', 'VALIDATOR', 360, 180, 'Validator 3', 'Raft consensus node (Follower)'],
       ['ipfs', 'IPFS', 500, 180, 'IPFS', 'Binary storage via content addressing'],
-      ['ethereum', 'ETHEREUM', 620, 60, 'Ethereum', 'Payment verification on Sepolia'],
+      ['ethereum', 'ETHEREUM', 620, 60, 'Ethereum', 'Settlement event on Sepolia'],
       ['eds', 'CONTENT', 220, 300, 'Edge Delivery', 'CDN delivery with 100 Lighthouse score'],
     ],
     edges: [
@@ -259,26 +259,26 @@ const FLOWS = {
     nodes: [
       ['author', 'AUTHOR', 70, 220, 'Author / Client', 'Submits write or delete proposal'],
       ['wallet', 'WALLET', 210, 120, 'Wallet + Signature', 'Signs proposal payload'],
-      ['payment', 'CONTRACT', 210, 320, 'Payment Path', 'Tier + tx hash (or mock) checked before acceptance'],
+      ['payment', 'CONTRACT', 210, 320, 'Settlement Path', 'Proposal settlement (or mock authorization) checked before acceptance'],
       ['ingress', 'VALIDATOR', 380, 220, 'Leader Ingress', 'Validates auth, schema, and routes request'],
       ['unverified', 'SEGMENT', 540, 90, 'Unverified Queue', 'Raw accepted proposals awaiting verifier pass'],
-      ['verifier', 'CONSENSUS', 540, 220, 'Verifier Agents', 'Proof/auth/payment checks + queue bookkeeping'],
-      ['epoch', 'ETHEREUM', 540, 350, 'Epoch Buckets', 'Standard/Express batched by epoch; Priority fast path'],
-      ['finalizer', 'CONSENSUS', 710, 220, 'Epoch Finalizer', 'Converts ready epoch buckets into message batches'],
+      ['verifier', 'CONSENSUS', 540, 220, 'Verifier Agents', 'Signature and settlement checks plus queue bookkeeping'],
+      ['buffer', 'SEGMENT', 540, 350, 'Adaptive Buffer', 'Verified proposals await capacity-governed release'],
+      ['packer', 'CONSENSUS', 710, 220, 'Adaptive Packer', 'Forms bounded message batches from ready work'],
       ['backpressure', 'VALIDATOR', 860, 120, 'Backpressure Gate', 'Caps in-flight sends and re-queues on timeout'],
       ['aeron', 'CONSENSUS', 860, 320, 'Aeron + Raft Log', 'Replicates batches to all validators'],
       ['commit', 'TRANSACTION', 980, 220, 'Deterministic Apply', 'Commit to Oak store + proposal persistence'],
     ],
     edges: [
       ['author', 'wallet', 'CONTROL', 'sign'],
-      ['author', 'payment', 'PAYMENT', 'tier + tx'],
+      ['author', 'payment', 'PAYMENT', 'settle'],
       ['wallet', 'ingress', 'DATA', 'proposal'],
       ['payment', 'ingress', 'CONTROL', 'verify route'],
       ['ingress', 'unverified', 'DATA', 'enqueue'],
       ['unverified', 'verifier', 'CONTROL', 'dequeue'],
-      ['verifier', 'epoch', 'DATA', 'classify by epoch+tier'],
-      ['epoch', 'finalizer', 'CONTROL', 'ready to finalize'],
-      ['finalizer', 'backpressure', 'CONTROL', 'batch send request'],
+      ['verifier', 'buffer', 'DATA', 'stage verified work'],
+      ['buffer', 'packer', 'CONTROL', 'capacity available'],
+      ['packer', 'backpressure', 'CONTROL', 'batch send request'],
       ['backpressure', 'aeron', 'ASYNC', 'offer / retry'],
       ['aeron', 'commit', 'DATA', 'quorum commit'],
       ['commit', 'ingress', 'ASYNC', 'counters + status'],
@@ -288,9 +288,9 @@ const FLOWS = {
       [['wallet', 'ingress', '#627EEA'], ['payment', 'ingress', '#65c2cb']],
       [['ingress', 'unverified', '#627EEA']],
       [['unverified', 'verifier', '#8C8DFC']],
-      [['verifier', 'epoch', '#627EEA']],
-      [['epoch', 'finalizer', '#8C8DFC']],
-      [['finalizer', 'backpressure', '#f0b429']],
+      [['verifier', 'buffer', '#627EEA']],
+      [['buffer', 'packer', '#8C8DFC']],
+      [['packer', 'backpressure', '#f0b429']],
       [['backpressure', 'aeron', '#65c2cb']],
       [['aeron', 'commit', '#627EEA']],
       [['commit', 'ingress', '#4ade80']],
@@ -298,7 +298,7 @@ const FLOWS = {
   },
   'gc-overview': {
     nodes: [
-      ['epoch', 'ETHEREUM', 70, 220, 'Epoch Finalization', 'Ethereum epoch triggers GC check'],
+      ['trigger', 'CONSENSUS', 70, 220, 'GC Trigger', 'Leader observes the configured reclaim threshold'],
       ['leader', 'VALIDATOR', 210, 120, 'Raft Leader', 'Only leader can propose GC'],
       ['gc_proposal', 'SIGNATURE', 210, 320, 'GC Proposal', 'Signed compaction proposal'],
       ['raft', 'CONSENSUS', 400, 220, 'Raft Consensus', 'Proposal replicated to all validators'],
@@ -308,8 +308,8 @@ const FLOWS = {
       ['reclaimed', 'CONTENT', 750, 220, 'Space Reclaimed', 'All validators reclaim same space'],
     ],
     edges: [
-      ['epoch', 'leader', 'CONTROL', 'trigger'],
-      ['epoch', 'gc_proposal', 'DATA', 'epoch ref'],
+      ['trigger', 'leader', 'CONTROL', 'evaluate'],
+      ['trigger', 'gc_proposal', 'DATA', 'store revision'],
       ['leader', 'gc_proposal', 'CONTROL', 'create'],
       ['gc_proposal', 'raft', 'DATA', 'broadcast'],
       ['raft', 'deterministic', 'CONTROL', 'replicate'],
@@ -319,7 +319,7 @@ const FLOWS = {
       ['commit', 'reclaimed', 'DATA', 'finalize'],
     ],
     sequence: [
-      [['epoch', 'leader', '#8C8DFC'], ['epoch', 'gc_proposal', '#627EEA']],
+      [['trigger', 'leader', '#8C8DFC'], ['trigger', 'gc_proposal', '#627EEA']],
       [['leader', 'gc_proposal', '#8C8DFC']],
       [['gc_proposal', 'raft', '#627EEA']],
       [['raft', 'deterministic', '#8C8DFC'], ['raft', 'local_gc', '#627EEA']],
@@ -635,7 +635,7 @@ function renderFlow(container, flowName) {
     viewBox: `0 0 ${width} ${height}`,
     class: 'flow-graph-svg',
     role: 'img',
-    'aria-label': `Flow diagram: ${flowName}`,
+    'aria-label': `Flow diagram: ${flowName.replaceAll('-', ' ')}`,
   });
 
   // defs
@@ -676,6 +676,8 @@ function renderFlow(container, flowName) {
       class: 'flow-graph-node',
       'data-node-id': node.id,
       tabindex: '0',
+      role: 'img',
+      'aria-label': `${node.label}. ${node.description}`,
     });
     g.appendChild(svgEl('circle', {
       r: node.radius + 8, fill: 'none', stroke: node.color, 'stroke-width': 1, class: 'flow-graph-node-glow',
@@ -815,6 +817,11 @@ export default function decorate(block) {
   const ctx = renderFlow(stage, flowName);
   if (!ctx) {
     playBtn.disabled = true;
+    return;
+  }
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    controls.hidden = true;
     return;
   }
 
