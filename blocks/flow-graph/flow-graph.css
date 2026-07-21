@@ -30,6 +30,11 @@
   cursor: not-allowed;
 }
 
+.flow-graph .flow-graph-play:focus-visible {
+  outline: 3px solid var(--brand-3);
+  outline-offset: 3px;
+}
+
 .flow-graph .flow-graph-play:hover:not(:disabled) {
   box-shadow: 0 0 30px rgb(98 126 234 / 50%);
   transform: translateY(-1px);
@@ -77,7 +82,8 @@
 
 .flow-graph .flow-graph-node:hover .flow-graph-node-glow,
 .flow-graph .flow-graph-node:focus-visible .flow-graph-node-glow {
-  opacity: 0.5;
+  opacity: 0.8;
+  stroke-width: 3;
 }
 
 .flow-graph .flow-graph-node-circle {

@@ -17,9 +17,12 @@
  * on pages that don't need it.
  */
 
-const MERMAID_CDN = 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+const MERMAID_VERSION = '11.16.0';
+const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.esm.min.mjs`;
 const THEME = {
   startOnLoad: false,
+  securityLevel: 'strict',
+  suppressErrorRendering: true,
   theme: 'dark',
   themeVariables: {
     primaryColor: '#627EEA',
@@ -52,6 +55,11 @@ export default async function decorate(block) {
   const code = block.querySelector('pre code, code');
   const source = (code?.textContent || block.textContent || '').trim();
   if (!source) return;
+
+  const diagramType = source.split(/\s|\n/, 1)[0].toLowerCase();
+  if (diagramType.startsWith('sequence')) block.classList.add('sequence');
+  else if (diagramType.startsWith('state')) block.classList.add('state');
+  else if (/^(?:graph|flowchart)$/.test(diagramType)) block.classList.add('wide');
 
   block.textContent = '';
   const stage = document.createElement('div');

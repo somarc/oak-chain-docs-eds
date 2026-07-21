@@ -7,6 +7,10 @@ indices:
       - /nav
       - /footer
       - /404
+      - /changelog
+      - /contributing
+      - /architecture-system-map
+      - /write-flow-and-content-fabric
       - /drafts/**
       - /tools/**
     properties:
