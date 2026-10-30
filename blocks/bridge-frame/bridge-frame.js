@@ -1,43 +1,26 @@
 /**
- * Bridge Frame block.
+ * Bridge Frame block: a two-column spec table.
  *
- * Two-column "what stays familiar | what is introduced" comparison.
- * The first row is treated as the column headers; subsequent rows are
- * paired bridge entries. Visually distinct from data-table — this is a
- * conceptual bridge, not a data grid.
+ * "What stays familiar | What is introduced". The first row holds the
+ * column heads; each later row is one paired entry. The decorator only
+ * classifies the authored rows and cells (and exposes table semantics),
+ * so Canvas keeps the editor identity of every cell.
  */
 export default function decorate(block) {
-  const rows = [...block.children];
-  block.textContent = '';
-  if (!rows.length) return;
+  const [head, ...rows] = [...block.children];
+  if (!head) return;
+  block.setAttribute('role', 'table');
 
-  const head = rows.shift();
-  const headCells = [...head.querySelectorAll(':scope > div')];
-  const header = document.createElement('div');
-  header.className = 'bridge-frame-head';
-  headCells.forEach((c) => {
-    const slot = document.createElement('div');
-    slot.textContent = c.textContent.trim();
-    header.appendChild(slot);
-  });
-  block.appendChild(header);
+  head.classList.add('bridge-frame-head');
+  head.setAttribute('role', 'row');
+  [...head.children].forEach((cell) => cell.setAttribute('role', 'columnheader'));
 
   rows.forEach((row) => {
-    const cells = [...row.querySelectorAll(':scope > div')];
-    const bridgeRow = document.createElement('div');
-    bridgeRow.className = 'bridge-frame-row';
-    if (cells[0]) {
-      const old = document.createElement('div');
-      old.className = 'bridge-frame-old';
-      old.textContent = cells[0].textContent.trim();
-      bridgeRow.appendChild(old);
-    }
-    if (cells[1]) {
-      const neu = document.createElement('div');
-      neu.className = 'bridge-frame-new';
-      neu.textContent = cells[1].textContent.trim();
-      bridgeRow.appendChild(neu);
-    }
-    block.appendChild(bridgeRow);
+    row.classList.add('bridge-frame-row');
+    row.setAttribute('role', 'row');
+    const [old, added] = [...row.children];
+    old?.classList.add('bridge-frame-old');
+    added?.classList.add('bridge-frame-new');
+    [...row.children].forEach((cell) => cell.setAttribute('role', 'cell'));
   });
 }

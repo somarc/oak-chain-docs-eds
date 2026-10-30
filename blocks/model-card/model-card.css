@@ -1,20 +1,67 @@
+/* Spec note: brass rule, mono kicker, ivory text, no fill or card radius. */
 .model-card {
-  background: linear-gradient(135deg, rgb(98 126 234 / 10%), rgb(140 141 252 / 5%));
-  border: 1px solid var(--brand-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin: 1.5rem 0;
+  margin-block: 1.5rem;
+  padding-inline-start: 1.25rem;
+  border-inline-start: 2px solid var(--brand-1);
+  color: var(--text-color);
+}
+
+.model-card::before {
+  content: 'Spec' / '';
+  display: block;
+  margin-block-end: 0.5rem;
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-3);
 }
 
 .model-card h3 {
-  color: var(--brand-2);
-  margin-top: 0;
+  margin-block: 0 0.5rem;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-s);
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .model-card strong {
-  color: var(--brand-2);
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+/* "Integration Path:" paragraph, wrapped by the decorator: a mono spec line. */
+.model-card .integration-path {
+  margin-block: 0.75rem;
+  padding-block: 0.5rem;
+  border-block: 1px solid var(--divider-color);
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-xs);
+}
+
+.model-card .integration-path p {
+  margin: 0;
+}
+
+.model-card .integration-path strong {
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.model-card .integration-path code {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--brand-3);
+}
+
+.model-card > :first-child {
+  margin-block-start: 0;
 }
 
 .model-card > :last-child {
-  margin-bottom: 0;
+  margin-block-end: 0;
 }

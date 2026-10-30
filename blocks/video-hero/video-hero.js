@@ -39,21 +39,19 @@ export default function decorate(block) {
     });
   });
 
+  // A leading h2 or p above the h1 is the kicker: classify it, never re-tag it.
   const h1 = content.querySelector('h1');
   const first = content.firstElementChild;
-  if (h1 && first && first !== h1 && first.tagName === 'H2') {
-    const kicker = document.createElement('p');
-    kicker.className = 'video-hero-kicker';
-    while (first.firstChild) kicker.append(first.firstChild);
-    first.replaceWith(kicker);
-  } else if (h1 && first && first !== h1 && first.tagName === 'P') {
+  if (h1 && first && first !== h1 && ['H2', 'P'].includes(first.tagName)) {
     first.classList.add('video-hero-kicker');
   }
 
   block.textContent = '';
 
+  // Canvas (quick-edit) renders the static scrim state: no autoplay over the editor.
+  const authoring = document.documentElement.hasAttribute('quick-edit');
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-  const loadMotion = shouldLoadMotionMedia({
+  const loadMotion = !authoring && shouldLoadMotionMedia({
     reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     saveData: Boolean(connection?.saveData),
     effectiveType: connection?.effectiveType || '',

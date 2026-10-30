@@ -1,20 +1,40 @@
+/* the footer is a quiet colophon */
 footer {
-  background-color: var(--light-color);
-  font-size: var(--body-font-size-xs);
+  border-block-start: var(--rule);
+  background-color: var(--background-color);
+  color: var(--text-muted);
+  font-family: var(--mono-font-family);
+  font-size: var(--label-font-size);
+  letter-spacing: 0.02em;
 }
 
 footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  padding: 2.5rem var(--gutter) 3rem;
 }
 
 footer .footer p {
-  margin: 0;
+  margin: 0 0 0.5rem;
 }
 
-@media (width >= 900px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
-  }
+footer .footer p:first-child {
+  margin-block-end: 1rem;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-s);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-color);
+}
+
+footer .footer a:any-link {
+  color: var(--text-color);
+}
+
+footer .footer a:hover {
+  color: var(--brand-2);
+}
+
+footer .footer em {
+  font-style: normal;
 }

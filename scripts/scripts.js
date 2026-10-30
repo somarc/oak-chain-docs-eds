@@ -10,6 +10,7 @@ import {
   loadSection,
   loadSections,
   loadCSS,
+  getMetadata,
 } from './aem.js';
 
 // Canvas authoring signal, set before any decoration runs.
@@ -88,6 +89,7 @@ function buildDocsLayout(main) {
   if (window.isErrorPage) return;
   const path = window.location.pathname;
   if (['/', '/index', '/nav', '/footer'].includes(path)) return;
+  if (getMetadata('template') === 'landing') return;
 
   if (!main.querySelector('.docs-sidebar')) {
     const section = document.createElement('div');

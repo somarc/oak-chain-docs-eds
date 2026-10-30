@@ -1,10 +1,12 @@
 # Oak Chain Docs live-release gate
 
-**Status:** CODE OPEN (2026-10-30) · CONTENT CLOSED  
+**Status:** OPEN (2026-10-30, owner decision) · code and content  
 **Applies to:** `oak-chain-docs-eds` DA content, code, generated index/sitemap state, and live route ownership  
 **Decision source:** *Oak Chain × x402 Decision Memo*, Revision 3 — paid-action centering, 2026-07-18
 
-**2026-10-30, owner decision:** code changes may merge to `main` (which updates live code). Live content publication, index/sitemap rebuilds and live route cleanup stay closed until the owner approves them explicitly.
+**2026-10-30, owner decisions:** first, code changes may merge to `main` (which updates live code). Later the same day, after the docs audit, consolidation (29 to 21 pages) and the technical-manual redesign were reviewed on preview, the owner approved publishing the amended content to live, rebuilding the index and sitemap, and unpublishing the retired and orphan routes.
+
+The x402 evidence list below no longer gates publication; it remains the bar for any page that claims paid actions over HTTP 402 are implemented. `/status` is where demonstrated versus not-yet-validated work is stated.
 
 **Recorded drift:** on 2026-10-24 between 14:55 and 14:57 GMT, 16 pages and `/nav` were republished to live while this gate was closed (admin status `live.lastModified`). Their live content is identical to preview; the operator is unknown.
 

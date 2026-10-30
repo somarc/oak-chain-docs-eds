@@ -19,21 +19,73 @@
 
 const MERMAID_VERSION = '11.16.0';
 const MERMAID_CDN = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.esm.min.mjs`;
+// House palette (DIRECTION.md): graphite field, ivory ink, brass accent.
+// Mermaid needs literal colours, so these mirror the :root tokens.
+const HOUSE = {
+  well: '#121315',
+  field: '#17181a',
+  plate: '#1f2124',
+  raised: '#25282c',
+  rule: '#3a3a39',
+  ivory: '#ece6d8',
+  muted: '#b0aca3',
+  faint: '#8e8b84',
+  brass: '#c8a35a',
+};
+
 const THEME = {
   startOnLoad: false,
   securityLevel: 'strict',
   suppressErrorRendering: true,
-  theme: 'dark',
+  theme: 'base',
   themeVariables: {
-    primaryColor: '#627EEA',
-    primaryTextColor: '#fff',
-    primaryBorderColor: '#8C8DFC',
-    lineColor: '#627EEA',
-    secondaryColor: '#1a1a2e',
-    tertiaryColor: '#16213e',
-    background: '#0f0f23',
-    mainBkg: '#1a1a2e',
-    nodeBorder: '#627EEA',
+    darkMode: true,
+    fontFamily: "'IBM Plex Sans', arial, sans-serif",
+    fontSize: '14px',
+    background: HOUSE.well,
+    primaryColor: HOUSE.plate,
+    primaryTextColor: HOUSE.ivory,
+    primaryBorderColor: HOUSE.brass,
+    secondaryColor: HOUSE.raised,
+    secondaryTextColor: HOUSE.ivory,
+    secondaryBorderColor: HOUSE.muted,
+    tertiaryColor: HOUSE.field,
+    tertiaryTextColor: HOUSE.ivory,
+    tertiaryBorderColor: HOUSE.rule,
+    mainBkg: HOUSE.plate,
+    nodeBorder: HOUSE.brass,
+    nodeTextColor: HOUSE.ivory,
+    textColor: HOUSE.ivory,
+    titleColor: HOUSE.ivory,
+    lineColor: HOUSE.muted,
+    edgeLabelBackground: HOUSE.well,
+    clusterBkg: HOUSE.field,
+    clusterBorder: HOUSE.rule,
+    actorBkg: HOUSE.plate,
+    actorBorder: HOUSE.brass,
+    actorTextColor: HOUSE.ivory,
+    actorLineColor: HOUSE.faint,
+    signalColor: HOUSE.muted,
+    signalTextColor: HOUSE.ivory,
+    labelBoxBkgColor: HOUSE.plate,
+    labelBoxBorderColor: HOUSE.brass,
+    labelTextColor: HOUSE.ivory,
+    loopTextColor: HOUSE.ivory,
+    noteBkgColor: HOUSE.raised,
+    noteBorderColor: HOUSE.brass,
+    noteTextColor: HOUSE.ivory,
+    activationBkgColor: HOUSE.raised,
+    activationBorderColor: HOUSE.brass,
+    sequenceNumberColor: HOUSE.field,
+    transitionColor: HOUSE.muted,
+    transitionLabelColor: HOUSE.muted,
+    stateLabelColor: HOUSE.ivory,
+    labelBackgroundColor: HOUSE.well,
+    compositeBackground: HOUSE.field,
+    compositeTitleBackground: HOUSE.plate,
+    altBackground: HOUSE.field,
+    specialStateColor: HOUSE.brass,
+    innerEndBackground: HOUSE.brass,
   },
 };
 
@@ -68,6 +120,8 @@ export default async function decorate(block) {
 
   try {
     const mermaid = await loadMermaid();
+    // Mermaid measures label text at render time; measure the house face.
+    await document.fonts?.ready;
     counter += 1;
     const id = `mermaid-svg-${counter}`;
     const { svg } = await mermaid.render(id, source);

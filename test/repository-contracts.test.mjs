@@ -56,9 +56,9 @@ test('repository declares DA as authored content authority', () => {
   assert.match(read('README.md'), /DA is the single source of truth/i);
 });
 
-test('live publication remains x402-gated', () => {
+test('release gate records the owner decision and keeps the x402 evidence bar', () => {
   const gate = read('RELEASE-GATE.md');
-  assert.match(gate, /Status:\*\*[^\n]*CONTENT CLOSED/);
+  assert.match(gate, /Status:\*\*[^\n]*owner decision/);
   assert.match(gate, /PAYMENT-REQUIRED/);
   assert.match(gate, /Existing live site must remain unchanged/i);
 });
