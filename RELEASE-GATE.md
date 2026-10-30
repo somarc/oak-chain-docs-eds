@@ -1,8 +1,12 @@
 # Oak Chain Docs live-release gate
 
-**Status:** CLOSED  
+**Status:** CODE OPEN (2026-10-30) · CONTENT CLOSED  
 **Applies to:** `oak-chain-docs-eds` DA content, code, generated index/sitemap state, and live route ownership  
 **Decision source:** *Oak Chain × x402 Decision Memo*, Revision 3 — paid-action centering, 2026-07-18
+
+**2026-10-30, owner decision:** code changes may merge to `main` (which updates live code). Live content publication, index/sitemap rebuilds and live route cleanup stay closed until the owner approves them explicitly.
+
+**Recorded drift:** on 2026-10-24 between 14:55 and 14:57 GMT, 16 pages and `/nav` were republished to live while this gate was closed (admin status `live.lastModified`). Their live content is identical to preview; the operator is unknown.
 
 ## Allowed while the gate is closed
 
