@@ -58,7 +58,7 @@ test('repository declares DA as authored content authority', () => {
 
 test('live publication remains x402-gated', () => {
   const gate = read('RELEASE-GATE.md');
-  assert.match(gate, /Status:\*\* CLOSED/);
+  assert.match(gate, /Status:\*\*[^\n]*CONTENT CLOSED/);
   assert.match(gate, /PAYMENT-REQUIRED/);
   assert.match(gate, /Existing live site must remain unchanged/i);
 });
