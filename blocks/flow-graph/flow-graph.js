@@ -63,11 +63,11 @@ const FLOWS = {
       ['validators1', 'VALIDATOR', 280, 80, 'Validators', 'Raft consensus cluster'],
       ['ethereum1', 'ETHEREUM', 480, 80, 'Ethereum', 'Payment & verification'],
       ['label1', 'CONTENT', 680, 80, 'Model 1', 'Blockchain-Native (new apps)', 20],
-      ['aem', 'AEM', 70, 260, 'Existing AEM', 'On-prem, AMS, AEMaaCS'],
-      ['http', 'CONSENSUS', 280, 260, 'oak-segment-http', 'HTTP segment transfer'],
+      ['aem', 'AEM', 70, 260, 'Existing AEM', 'On-prem or AMS (target)'],
+      ['http', 'CONSENSUS', 280, 260, 'HTTP mount', 'HTTP segment transfer'],
       ['validators2', 'VALIDATOR', 480, 260, 'Validators', 'Same cluster, different access'],
       ['label2', 'CONTENT', 680, 260, 'Model 2', 'AEM Integration (existing)', 20],
-      ['ipfs', 'IPFS', 280, 170, 'Author IPFS', 'Binaries at source (CID only in validators)'],
+      ['ipfs', 'IPFS', 280, 170, 'Author IPFS', 'Bytes addressed by CID; consensus stores the CID'],
     ],
     edges: [
       ['eds', 'validators1', 'DATA', 'HTTPS API'],
@@ -88,13 +88,13 @@ const FLOWS = {
   },
   'aem-integration': {
     nodes: [
-      ['aem', 'AEM', 70, 180, 'Existing AEM', 'On-prem, AMS, AEMaaCS, or CQ variant'],
+      ['aem', 'AEM', 70, 180, 'Existing AEM', 'On-prem or AMS (target)'],
       ['composite', 'OAK_STORE', 220, 180, 'Composite Mount', 'Oak CompositeNodeStore'],
       ['local', 'SEGMENT', 220, 80, '/content (local)', 'Read-write local content'],
-      ['http', 'CONSENSUS', 400, 180, 'oak-segment-http', 'HTTP persistence layer'],
+      ['http', 'CONSENSUS', 400, 180, 'HTTP mount', 'HTTP persistence layer'],
       ['validators', 'VALIDATOR', 580, 180, 'Validators', 'Raft consensus cluster'],
       ['oakchain', 'OAK_STORE', 580, 80, '/oak-chain (remote)', 'Read-only blockchain content'],
-      ['ethereum', 'ETHEREUM', 750, 180, 'Ethereum', 'Settlement authorization'],
+      ['ethereum', 'ETHEREUM', 750, 180, 'Ethereum', 'Settlement (sepolia mode)'],
     ],
     edges: [
       ['aem', 'composite', 'DATA', 'JCR API'],
@@ -121,8 +121,8 @@ const FLOWS = {
       ['leader', 'VALIDATOR', 380, 200, 'Raft Leader', 'Receives and validates proposals'],
       ['consensus', 'CONSENSUS', 520, 100, 'Log Replication', 'Proposal replicated to followers'],
       ['followers', 'VALIDATOR', 520, 300, 'Followers', 'Replicate and acknowledge'],
-      ['commit', 'TRANSACTION', 660, 200, 'Commit', 'Entry committed to log'],
-      ['oak', 'OAK_STORE', 780, 200, 'Oak Store', 'Content persisted to segments'],
+      ['commit', 'TRANSACTION', 660, 200, 'Commit', 'Ordered in the Raft log'],
+      ['oak', 'OAK_STORE', 780, 200, 'Oak Stores', 'Every validator applies the write'],
     ],
     edges: [
       ['author', 'wallet', 'DATA', 'content'],
