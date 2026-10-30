@@ -31,6 +31,12 @@ test('interactive flow diagrams do not reintroduce retired settlement language',
   assert.equal(forbidden.test(flow), false);
 });
 
+test('mobile header locks page scroll only while its menu is open', () => {
+  const header = read('blocks/header/header.js');
+  assert.match(header, /overflowY = \(expanded && !isDesktop\.matches\) \? 'hidden' : ''/);
+  assert.doesNotMatch(header, /overflowY = \(!expanded/);
+});
+
 test('shared navigation is the authored source for the docs rail', () => {
   const sidebar = read('blocks/docs-sidebar/docs-sidebar.js');
   assert.match(sidebar, /loadFragment\(navPath\)/);
