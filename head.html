@@ -12,7 +12,8 @@
 <script nonce="aem">
   (() => {
     const path = window.location.pathname.replace(/\/$/, '') || '/';
-    if (!['/', '/index', '/nav', '/footer'].includes(path)) {
+    const landing = document.querySelector('meta[name="template"]')?.content === 'landing';
+    if (!landing && !['/', '/index', '/nav', '/footer'].includes(path)) {
       document.documentElement.classList.add('docs-page');
     }
   })();
