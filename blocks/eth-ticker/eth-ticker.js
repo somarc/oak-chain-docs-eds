@@ -26,11 +26,11 @@ function isFresh(cache) {
   return Boolean(cache && cache.ts && (Date.now() - cache.ts) < TTL_MS);
 }
 
-function formatPrice(value) {
+export function formatPrice(value, currency) {
   if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(currency === 'CAD' ? 'en-CA' : 'en-US', {
     style: 'currency',
-    currency: 'USD',
+    currency,
     maximumFractionDigits: 0,
   }).format(value);
 }
@@ -47,8 +47,8 @@ async function fetchPrice() {
 }
 
 function render(block, cache, stale) {
-  const usd = cache ? formatPrice(cache.usd) : '—';
-  const cad = cache ? formatPrice(cache.cad) : '—';
+  const usd = cache ? formatPrice(cache.usd, 'USD') : '—';
+  const cad = cache ? formatPrice(cache.cad, 'CAD') : '—';
   block.dataset.stale = stale ? 'true' : 'false';
   block.innerHTML = `
     <span class="eth-ticker-symbol" aria-hidden="true">ETH</span>

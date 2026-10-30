@@ -1,15 +1,18 @@
+const KNOWN_DIMENSIONS = {
+  'system-map': { width: 1600, height: 1320 },
+  landscape: { width: 2800, height: 1600 },
+};
+
 /**
  * Picture block.
  *
  * Renders an <img> client-side from an authored src + optional alt + href +
- * caption, bypassing Helix's image-transform pipeline. Helix's pipeline
- * tries to fetch images from the content-bus and falls back to
- * `src="about:error"` for repo-static paths and DA-uploaded media that
- * aren't dropped via the DA editor.
+ * caption, bypassing Helix's image-transform pipeline. Authored variants can
+ * provide stable intrinsic dimensions for repo-static assets.
  *
  * Authoring contract (positional cells):
- *   <div class="picture">
- *     <div><div>/diagrams/oak-chain-write-flow-plate.png</div></div>  src
+ *   <div class="picture system-map">
+ *     <div><div>/diagrams/oak-chain-system-map-v2.svg</div></div>  src
  *     <div><div>Optional alt text</div></div>                         alt
  *     <div><div><a href="…">…</a></div></div>                         href (optional)
  *     <div><div><em>Optional caption</em></div></div>                 caption (optional)
@@ -29,31 +32,38 @@ export default function decorate(block) {
   const alt = text(1);
   const href = linkOf(2);
   const caption = captionOf(3);
+  const dimensions = Object.entries(KNOWN_DIMENSIONS)
+    .find(([variant]) => block.classList.contains(variant))?.[1];
 
   block.textContent = '';
   if (!src) return;
 
   const figure = document.createElement('figure');
-
   const img = document.createElement('img');
   img.src = src;
   img.alt = alt;
-  img.loading = 'lazy';
+  img.loading = block.classList.contains('system-map') ? 'eager' : 'lazy';
+  img.decoding = 'async';
+  if (block.classList.contains('system-map')) img.fetchPriority = 'high';
+  if (dimensions) {
+    img.width = dimensions.width;
+    img.height = dimensions.height;
+  }
 
   if (href) {
-    const a = document.createElement('a');
-    a.href = href;
-    a.appendChild(img);
-    figure.appendChild(a);
+    const anchor = document.createElement('a');
+    anchor.href = href;
+    anchor.append(img);
+    figure.append(anchor);
   } else {
-    figure.appendChild(img);
+    figure.append(img);
   }
 
   if (caption) {
-    const cap = document.createElement('figcaption');
-    cap.innerHTML = caption;
-    figure.appendChild(cap);
+    const figcaption = document.createElement('figcaption');
+    figcaption.innerHTML = caption;
+    figure.append(figcaption);
   }
 
-  block.appendChild(figure);
+  block.append(figure);
 }

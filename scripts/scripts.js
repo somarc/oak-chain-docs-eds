@@ -12,6 +12,16 @@ import {
   loadCSS,
 } from './aem.js';
 
+// Canvas authoring signal, set before any decoration runs.
+const params = new URLSearchParams(window.location.search);
+const QUICK_EDIT = params.has('quick-edit');
+if (QUICK_EDIT) document.documentElement.setAttribute('quick-edit', '');
+
+/** True inside DA Canvas / quick-edit. Gate interaction with it, never content. */
+export function isAuthoring() {
+  return document.documentElement.hasAttribute('quick-edit');
+}
+
 /**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
@@ -28,18 +38,6 @@ function buildHeroBlock(main) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
     main.prepend(section);
-  }
-}
-
-/**
- * load fonts.css and set a session storage flag
- */
-async function loadFonts() {
-  await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
-  try {
-    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
-  } catch (e) {
-    // do nothing
   }
 }
 
@@ -87,13 +85,16 @@ function buildAutoBlocks(main) {
  */
 function buildDocsLayout(main) {
   if (main !== document.querySelector('body > main')) return;
+  if (window.isErrorPage) return;
   const path = window.location.pathname;
-  if (path === '/' || path === '/index') return;
+  if (['/', '/index', '/nav', '/footer'].includes(path)) return;
 
   if (!main.querySelector('.docs-sidebar')) {
     const section = document.createElement('div');
     section.append(buildBlock('docs-sidebar', { elems: [] }));
-    main.prepend(section);
+    // Keep authored content first so the real page LCP section owns eager load.
+    // The rail is fixed-positioned, so DOM placement does not affect its visual position.
+    main.append(section);
   }
   if (!main.querySelector('.page-toc')) {
     const section = document.createElement('div');
@@ -141,6 +142,12 @@ function decorateButtons(main) {
   });
 }
 
+function decorateScrollableRegions(main) {
+  main.querySelectorAll('pre').forEach((pre) => {
+    pre.tabIndex = 0;
+  });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -152,6 +159,7 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateBlocks(main);
   decorateButtons(main);
+  decorateScrollableRegions(main);
 }
 
 /**
@@ -163,18 +171,17 @@ async function loadEager(doc) {
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {
+    main.id = main.id || 'main-content';
+    if (!doc.querySelector('.skip-link')) {
+      const skipLink = doc.createElement('a');
+      skipLink.className = 'skip-link';
+      skipLink.href = '#main-content';
+      skipLink.textContent = 'Skip to main content';
+      doc.body.prepend(skipLink);
+    }
     decorateMain(main);
     document.body.classList.add('appear');
     await loadSection(main.querySelector('.section'), waitForFirstImage);
-  }
-
-  try {
-    /* if desktop (proxy for fast connection) or fonts already loaded, load fonts.css */
-    if (window.innerWidth >= 900 || sessionStorage.getItem('fonts-loaded')) {
-      loadFonts();
-    }
-  } catch (e) {
-    // do nothing
   }
 }
 
@@ -183,19 +190,20 @@ async function loadEager(doc) {
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
-  loadHeader(doc.querySelector('header'));
+  const header = doc.querySelector('body > header');
+  if (header) loadHeader(header);
 
   const main = doc.querySelector('main');
-  await loadSections(main);
+  if (main) await loadSections(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
 
-  loadFooter(doc.querySelector('footer'));
+  const footer = doc.querySelector('body > footer');
+  if (footer) loadFooter(footer);
 
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
-  loadFonts();
 }
 
 /**
@@ -208,10 +216,27 @@ function loadDelayed() {
   // load anything that can be postponed to the latest here
 }
 
-async function loadPage() {
-  await loadEager(document);
-  await loadLazy(document);
+export async function loadPage(doc = document) {
+  await loadEager(doc);
+  await loadLazy(doc);
   loadDelayed();
+}
+
+// Load quick-edit ourselves so preview.da.live serves this file unchanged.
+if (QUICK_EDIT) {
+  let payload = {};
+  try {
+    const q = params.get('quick-edit');
+    payload = q && q !== 'on' ? JSON.parse(decodeURIComponent(q)) : {};
+  } catch { /* plain flag */ }
+  try {
+    // eslint-disable-next-line import/no-unresolved
+    const { default: loadQuickEdit } = await import('https://da.live/nx/public/plugins/quick-edit/quick-edit.js');
+    await loadQuickEdit(payload, loadPage);
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.warn('quick-edit unavailable outside Canvas', error);
+  }
 }
 
 loadPage();
