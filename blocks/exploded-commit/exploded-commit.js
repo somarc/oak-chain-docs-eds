@@ -132,7 +132,7 @@ function layoutLabels(block, figure, list, svg) {
     if (leaders[index]) drawLeader(leaders[index], index, 0, svg);
   });
   const columned = window.matchMedia(WIDE).matches && !items.some((item) => item.classList.contains('is-extra'));
-  block.classList.toggle('is-columned', columned);
+  block.classList.toggle('is-stacked', !columned);
   if (!columned) return;
 
   const box = list.getBoundingClientRect();
@@ -146,7 +146,7 @@ function layoutLabels(block, figure, list, svg) {
     return push;
   });
   if (floor > limit) {
-    block.classList.remove('is-columned');
+    block.classList.add('is-stacked');
     return;
   }
   items.forEach((item, index) => {

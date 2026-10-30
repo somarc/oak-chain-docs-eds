@@ -303,47 +303,51 @@
 }
 
 /*
- * Columned (set by the block script from 900px when the labels fit): labels sit
- * on the leaders' ends, each pushed down by --ec-push to clear the one above.
+ * Columned by default from 900px, so the first paint already has the final
+ * layout (no shift); the script adds .is-stacked only when the labels do not
+ * fit beside the figure. Labels sit on the leaders' ends, each pushed down by
+ * --ec-push to clear the one above.
  */
-.exploded-commit.is-columned {
-  grid-template-columns: minmax(0, 30rem) minmax(15rem, 1fr);
-  gap: 0;
-  align-items: stretch;
-}
+@media (width >= 900px) {
+  .exploded-commit.has-figure:not(.is-stacked) {
+    grid-template-columns: minmax(0, 30rem) minmax(15rem, 1fr);
+    gap: 0;
+    align-items: stretch;
+  }
 
-.exploded-commit.is-columned .exploded-commit-figure {
-  max-inline-size: none;
-  margin-inline: 0;
-}
+  .exploded-commit.has-figure:not(.is-stacked) .exploded-commit-figure {
+    max-inline-size: none;
+    margin-inline: 0;
+  }
 
-.exploded-commit.is-columned .exploded-commit-marker {
-  display: none;
-}
+  .exploded-commit.has-figure:not(.is-stacked) .exploded-commit-marker {
+    display: none;
+  }
 
-/* the leaders run on past the figure's edge to the labels */
-.exploded-commit.is-columned .ec-svg {
-  overflow: visible;
-}
+  /* the leaders run on past the figure's edge to the labels */
+  .exploded-commit.has-figure:not(.is-stacked) .ec-svg {
+    overflow: visible;
+  }
 
-.exploded-commit.is-columned .exploded-commit-list {
-  position: relative;
-  display: block;
-  border-block-start: 0;
-}
+  .exploded-commit.has-figure:not(.is-stacked) .exploded-commit-list {
+    position: relative;
+    display: block;
+    border-block-start: 0;
+  }
 
-.exploded-commit.is-columned .exploded-commit-item {
-  position: absolute;
-  inset-block-start: calc(var(--ec-anchor) + var(--ec-push));
-  inset-inline: 0;
-  padding-block: 0;
-  padding-inline-start: 2.25rem;
-  border-block-end: 0;
-  transform: translateY(calc(var(--label-font-size) * -0.65));
+  .exploded-commit.has-figure:not(.is-stacked) .exploded-commit-item {
+    position: absolute;
+    inset-block-start: calc(var(--ec-anchor) + var(--ec-push));
+    inset-inline: 0;
+    padding-block: 0;
+    padding-inline-start: 2.25rem;
+    border-block-end: 0;
+    transform: translateY(calc(var(--label-font-size) * -0.65));
+  }
 }
 
 @media (width >= 1200px) {
-  .exploded-commit.is-columned {
+  .exploded-commit.has-figure:not(.is-stacked) {
     grid-template-columns: minmax(0, 34rem) minmax(18rem, 1fr);
   }
 }
