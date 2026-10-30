@@ -181,6 +181,8 @@ function watchLayout(block, figure, list, svg) {
     if (!next || next === width) return;
     width = next;
     layoutLabels(block, figure, list, svg);
+    // first settled layout: the section may now show the figure (no shift)
+    block.classList.add('is-ready');
   });
   controller.signal.addEventListener('abort', () => observer.disconnect(), { once: true });
   observer.observe(gauge);
@@ -246,7 +248,15 @@ export default async function decorate(block) {
   }
 
   block.replaceChildren(figure, list);
-  if (svg) watchLayout(block, figure, list, svg);
+  if (svg) {
+    watchLayout(block, figure, list, svg);
+    // block CSS is loaded before decorate runs: lay out once on the next frame,
+    // then let the section show the figure (it appears; nothing shifts)
+    requestAnimationFrame(() => {
+      layoutLabels(block, figure, list, svg);
+      block.classList.add('is-ready');
+    });
+  } else block.classList.add('is-ready');
 
   if (authoring || !svg) return;
   wireHighlight(block);

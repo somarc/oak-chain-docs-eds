@@ -527,14 +527,24 @@ main .section.highlight {
 main > .section.manual-hero {
   box-sizing: border-box;
   display: grid;
-  align-content: center;
+  align-content: start;
   gap: clamp(2rem, 1rem + 4vw, 4rem);
   max-inline-size: calc(var(--content-max) + 2 * var(--gutter));
   min-block-size: calc(100svh - var(--nav-height));
   margin-block: 0 var(--section-space);
   margin-inline: auto;
-  padding-block: clamp(2rem, 1rem + 4vw, 4.5rem);
+  padding-block: clamp(2.5rem, 1rem + 8vh, 7rem) clamp(2rem, 1rem + 4vw, 4.5rem);
   padding-inline: var(--gutter);
+}
+
+/*
+ * The first section paints before its blocks decorate (LCP). Rows are
+ * top-aligned so the text never moves when the figure replaces the raw rows,
+ * and the figure's region stays hidden until the block's first settled layout.
+ * Never in Canvas: authors always see the block, whatever the editor does.
+ */
+html:not([quick-edit]) main > .section.manual-hero > .exploded-commit-wrapper:not(:has(> .is-ready)) {
+  visibility: hidden;
 }
 
 main > .section.manual-hero > div {
@@ -583,7 +593,11 @@ main > .section.manual-hero :is(.default-content-wrapper, .prosemirror-editor, [
 @media (width >= 900px) {
   main > .section.manual-hero {
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    align-items: center;
+    align-items: start;
+  }
+
+  main > .section.manual-hero > .exploded-commit-wrapper {
+    align-self: center;
   }
 }
 
