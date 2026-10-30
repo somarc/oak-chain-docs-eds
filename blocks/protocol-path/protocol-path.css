@@ -1,45 +1,83 @@
+/* Assembly sequence: mono step numbers on a hairline rail with ticks. */
 .protocol-path {
+  --tick: 0.5rem;
+
+  counter-reset: step;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
-  margin: 2rem 0;
-  counter-reset: protocol;
+  margin-block: 2rem;
+  border-inline-start: var(--rule);
 }
 
 .protocol-path .protocol-step {
   position: relative;
-  padding: 1.1rem 1.1rem 1.1rem 3.2rem;
-  background: linear-gradient(140deg, rgb(98 126 234 / 12%), rgb(20 24 44 / 60%));
-  border: 1px solid var(--brand-border);
-  border-radius: 10px;
-  display: flex;
-  align-items: flex-start;
-  min-height: 80px;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  align-items: baseline;
+  padding-block: 0.75rem;
+  padding-inline-start: 1rem;
+  counter-increment: step;
 }
 
-.protocol-path .protocol-step:hover {
-  border-color: var(--brand-2);
-  transform: translateY(-1px);
-}
-
-.protocol-path .protocol-step-num {
-  position: absolute;
-  top: 0.9rem;
-  left: 1rem;
+.protocol-path .protocol-step::before {
+  content: counter(step, decimal-leading-zero) / '';
   font-family: var(--mono-font-family);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--brand-2);
-  opacity: 0.8;
-  line-height: 1;
+  font-size: var(--body-font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--brand-1);
+}
+
+/* Tick mark across the rail, level with the step number. */
+.protocol-path .protocol-step::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 1.5rem;
+  inset-inline-start: calc(var(--tick) / -2);
+  inline-size: var(--tick);
+  block-size: 1px;
+  background: var(--border-color);
 }
 
 .protocol-path .protocol-step-text {
-  display: block;
-  margin-top: 0.1rem;
   color: var(--text-color);
   font-size: var(--body-font-size-s);
   line-height: 1.45;
+}
+
+/* stylelint-disable-next-line selector-class-pattern -- .ProseMirror is the da-nx Canvas editor class */
+.protocol-path .protocol-step-text :is(p, .prosemirror-editor, .ProseMirror) {
+  margin: 0;
+}
+
+@media (width >= 900px) {
+  .protocol-path {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    border-inline-start: 0;
+    border-block-start: var(--rule);
+  }
+
+  .protocol-path .protocol-step {
+    display: block;
+    padding-block: 1.25rem 0;
+    padding-inline: 0 1.25rem;
+  }
+
+  .protocol-path .protocol-step::before {
+    display: block;
+    margin-block-end: 0.75rem;
+  }
+
+  .protocol-path .protocol-step::after {
+    inset-block-start: calc(var(--tick) / -2);
+    inset-inline-start: 0;
+    inline-size: 1px;
+    block-size: var(--tick);
+  }
+}
+
+@media (forced-colors: active) {
+  .protocol-path .protocol-step::after {
+    background: CanvasText;
+  }
 }

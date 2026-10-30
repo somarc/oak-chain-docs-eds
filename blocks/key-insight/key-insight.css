@@ -1,20 +1,44 @@
+/* Margin note: brass rule, mono kicker, ivory text, no fill. */
 .key-insight {
-  background: linear-gradient(135deg, rgb(98 126 234 / 12%), rgb(140 141 252 / 8%));
-  border-left: 4px solid var(--brand-1);
-  padding: 1rem 1.5rem;
-  border-radius: 0 8px 8px 0;
-  margin: 1.5rem 0;
-  font-size: 1.05em;
+  margin-block: 1.5rem;
+  padding-inline-start: 1.25rem;
+  border-inline-start: 2px solid var(--brand-1);
+  color: var(--text-color);
+  font-size: var(--body-font-size-m);
+  line-height: 1.6;
+}
+
+.key-insight::before {
+  content: 'Note' / '';
+  display: block;
+  margin-block-end: 0.5rem;
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-3);
 }
 
 .key-insight strong {
-  color: var(--brand-2);
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.key-insight a {
+  color: var(--brand-1);
 }
 
 .key-insight > :first-child {
-  margin-top: 0;
+  margin-block-start: 0;
 }
 
 .key-insight > :last-child {
-  margin-bottom: 0;
+  margin-block-end: 0;
+}
+
+@media (width >= 900px) {
+  .key-insight {
+    max-inline-size: 48rem;
+  }
 }

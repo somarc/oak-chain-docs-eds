@@ -10,10 +10,11 @@
 }
 
 .hero h1 {
-  max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
-  color: var(--background-color);
+  max-inline-size: 1200px;
+  margin-inline: auto;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .hero picture {

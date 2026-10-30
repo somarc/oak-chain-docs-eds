@@ -1,41 +1,59 @@
+/* Figure plate: the image on a hairline frame, mono "FIG." caption under a rule. */
 .picture {
-  margin: 1.5rem 0;
+  margin-block: 1.5rem;
 }
 
 .picture figure {
+  max-inline-size: 50rem;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 800px;
 }
 
 .picture figure img {
   display: block;
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
+  max-inline-size: 100%;
+  block-size: auto;
+  border: var(--rule);
+  border-radius: 2px;
 }
 
 .picture figure a {
-  display: inline-block;
+  display: block;
   text-decoration: none;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.picture figure a:hover {
-  transform: translateY(-2px);
 }
 
 .picture figure a:hover img {
-  box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
+  border-color: var(--brand-1);
 }
 
 .picture figcaption {
-  margin-top: 0.75rem;
-  text-align: center;
-  font-style: italic;
+  margin-block-start: 0.75rem;
+  padding-block-start: 0.5rem;
+  border-block-start: var(--rule);
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-xs);
+  line-height: 1.5;
   color: var(--text-faint);
-  font-size: var(--body-font-size-s);
+}
+
+.picture figcaption::before {
+  content: 'Fig. \2014\00a0' / '';
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand-1);
+}
+
+.picture figcaption :is(em, i) {
+  font-style: normal;
+}
+
+/* Source, alt and link rows stay authorable in Canvas, hidden when published. */
+.picture > [data-config] {
+  display: none;
+}
+
+html[quick-edit] .picture > [data-config] {
+  display: block;
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-xs);
+  color: var(--text-faint);
 }

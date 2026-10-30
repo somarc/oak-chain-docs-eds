@@ -18,24 +18,23 @@ const KNOWN_DIMENSIONS = {
  *     <div><div><em>Optional caption</em></div></div>                 caption (optional)
  *   </div>
  *
- * Empty cells are skipped; positional intent is preserved.
+ * Empty cells are skipped; positional intent is preserved. The src, alt and
+ * href rows stay in the DOM as [data-config] (editable in Canvas, hidden when
+ * published); the authored caption nodes move intact into the figcaption.
  */
 export default function decorate(block) {
   const cells = [...block.querySelectorAll(':scope > div > div')];
   const text = (i) => cells[i]?.textContent.trim() || '';
   const linkOf = (i) => cells[i]?.querySelector('a')?.getAttribute('href') || '';
-  const captionOf = (i) => cells[i]?.querySelector('em, i')?.innerHTML
-    || cells[i]?.innerHTML?.trim()
-    || '';
 
   const src = text(0);
   const alt = text(1);
   const href = linkOf(2);
-  const caption = captionOf(3);
+  const captionCell = cells[3];
   const dimensions = Object.entries(KNOWN_DIMENSIONS)
     .find(([variant]) => block.classList.contains(variant))?.[1];
 
-  block.textContent = '';
+  cells.slice(0, 3).forEach((cell) => { cell.parentElement.dataset.config = ''; });
   if (!src) return;
 
   const figure = document.createElement('figure');
@@ -59,9 +58,10 @@ export default function decorate(block) {
     figure.append(img);
   }
 
-  if (caption) {
+  if (captionCell?.textContent.trim()) {
     const figcaption = document.createElement('figcaption');
-    figcaption.innerHTML = caption;
+    figcaption.append(...captionCell.childNodes);
+    captionCell.parentElement.remove();
     figure.append(figcaption);
   }
 

@@ -1,122 +1,97 @@
+/* House hero: left-set display type on the graphite field, rectangular
+   outlined commands, mono bracketed tags. No gradients, grids or glows. */
 .hero-oak {
-  padding: 4rem 0 3rem;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-oak::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgb(98 126 234 / 16%), transparent 70%),
-    linear-gradient(rgb(98 126 234 / 4%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(98 126 234 / 4%) 1px, transparent 1px);
-  background-size: 100% 100%, 32px 32px, 32px 32px;
-  opacity: 0.85;
-  pointer-events: none;
-  z-index: -1;
+  padding-block: 4rem 3rem;
+  border-block-end: var(--rule);
 }
 
 .hero-oak .hero-oak-title {
-  margin: 0 0 0.5rem;
-  font-size: clamp(48px, 8vw, 96px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  margin: 0 0 0.75rem;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-xxl);
+  font-weight: 600;
   line-height: 1;
-  background: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-2) 50%, var(--brand-3) 100%);
-  background-clip: text;
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-background-clip: text;
-  /* stylelint-disable-next-line property-no-vendor-prefix */
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  letter-spacing: -0.01em;
+  color: var(--text-color);
 }
 
 .hero-oak .hero-oak-tagline {
-  margin: 0 0 1.5rem;
-  font-size: clamp(20px, 3vw, 28px);
+  margin: 0 0 1.25rem;
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-m);
   font-weight: 600;
+  line-height: 1.2;
   color: var(--text-color);
-  letter-spacing: -0.01em;
 }
 
 .hero-oak .hero-oak-body {
-  margin: 0 auto 2rem;
-  max-width: 640px;
+  max-inline-size: 40rem;
+  margin: 0 0 2rem;
   font-size: var(--body-font-size-m);
-  color: var(--text-muted);
   line-height: 1.6;
+  color: var(--text-muted);
 }
 
 .hero-oak .hero-oak-ctas {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  margin-bottom: 2.5rem;
+  gap: 0.75rem;
+  margin-block-end: 2.5rem;
 }
 
 .hero-oak .hero-oak-cta {
   display: inline-flex;
   align-items: center;
-  padding: 0.75rem 1.4rem;
-  border-radius: 10px;
-  font-weight: 600;
-  text-decoration: none;
-  font-size: var(--body-font-size-m);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  min-height: 48px;
   box-sizing: border-box;
+  min-block-size: 2.75rem;
+  padding: 0.625rem 1.25rem;
+  border: 1px solid var(--brand-1);
+  border-radius: 2px;
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-s);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
 .hero-oak .hero-oak-cta-primary {
-  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
-  color: #fff;
-  box-shadow: 0 8px 24px rgb(98 126 234 / 30%);
-  border: 1px solid transparent;
-}
-
-.hero-oak .hero-oak-cta-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgb(98 126 234 / 50%);
-  text-decoration: none;
-  color: #fff;
+  color: var(--brand-1);
 }
 
 .hero-oak .hero-oak-cta-secondary {
-  background: transparent;
-  color: var(--brand-2);
-  border: 1px solid var(--brand-border);
+  border-color: var(--text-muted);
+  color: var(--text-color);
 }
 
-.hero-oak .hero-oak-cta-secondary:hover {
-  background: var(--brand-soft);
+.hero-oak .hero-oak-cta:hover {
   border-color: var(--brand-2);
-  color: var(--brand-3);
-  transform: translateY(-2px);
+  background: var(--brand-soft);
+  color: var(--brand-2);
   text-decoration: none;
 }
 
 .hero-oak .hero-oak-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  max-width: 720px;
-  margin: 0 auto;
+  gap: 0.5rem 1.25rem;
+  padding-block-start: 1rem;
+  border-block-start: var(--rule);
 }
 
 .hero-oak .hero-oak-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  color: var(--text-muted);
-  background: linear-gradient(135deg, rgb(98 126 234 / 18%), rgb(50 56 90 / 35%));
-  border: 1px solid var(--brand-border);
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.hero-oak .hero-oak-chip::before {
+  content: '[\00a0' / '';
+}
+
+.hero-oak .hero-oak-chip::after {
+  content: '\00a0]' / '';
 }

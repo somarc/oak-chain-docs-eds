@@ -1,122 +1,97 @@
 .video-hero-container .video-hero-wrapper {
-  max-width: unset;
+  max-inline-size: unset;
   padding: 0;
 }
 
-.video-hero-container {
-  position: relative;
-}
-
-.video-hero-container::after {
-  content: '';
-  position: absolute;
-  z-index: 4;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 120px;
-  background: linear-gradient(180deg, transparent, var(--background-color));
-  pointer-events: none;
-}
-
+/* Full-bleed plate: graphite field, a flat graphite scrim over any video,
+   display type set left. No glows, grids or text shadows. */
 .video-hero {
   isolation: isolate;
   position: relative;
   display: grid;
   align-content: end;
-  min-height: calc(100svh - var(--nav-height));
-  padding: 56px 24px;
+  min-block-size: calc(100svh - var(--nav-height));
+  padding: 3.5rem 1.5rem;
   overflow: hidden;
-  background:
-    linear-gradient(115deg, rgb(98 126 234 / 54%), transparent 42%),
-    linear-gradient(35deg, rgb(165 166 255 / 30%), transparent 44%),
-    #0f0f23;
+  border-block-end: var(--rule);
+  background: var(--background-color);
   color: var(--text-color);
 }
 
 .video-hero video {
   position: absolute;
-  z-index: -3;
+  z-index: -2;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.video-hero::before,
-.video-hero::after {
+.video-hero.has-video::before {
   content: '';
   position: absolute;
-  pointer-events: none;
-}
-
-.video-hero::before {
-  z-index: -2;
-  inset: 0;
-  background:
-    linear-gradient(90deg, rgb(165 166 255 / 10%) 1px, transparent 1px) 0 0 / 56px 56px,
-    linear-gradient(180deg, rgb(165 166 255 / 7%) 1px, transparent 1px) 0 0 / 56px 56px,
-    linear-gradient(90deg, rgb(15 15 35 / 88%) 0%, rgb(15 15 35 / 58%) 42%, rgb(15 15 35 / 20%) 100%),
-    linear-gradient(0deg, rgb(15 15 35 / 82%) 0%, transparent 48%, rgb(15 15 35 / 44%) 100%);
-}
-
-.video-hero::after {
   z-index: -1;
   inset: 0;
-  background: radial-gradient(circle at 25% 72%, rgb(98 126 234 / 24%), transparent 34%);
-  mix-blend-mode: screen;
+  background: var(--background-color);
+  opacity: 0.72;
+  pointer-events: none;
 }
 
 .video-hero-content {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-inline-size: 1200px;
+  margin-inline: auto;
 }
 
 .video-hero h1 {
-  max-width: 920px;
+  max-inline-size: 18ch;
   margin: 0;
   color: inherit;
-  font-size: var(--heading-font-size-xl);
-  line-height: 1.04;
-  text-shadow: 0 16px 48px rgb(0 0 0 / 42%);
+  font-family: var(--heading-font-family);
+  font-size: var(--heading-font-size-xxl);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
 }
 
 .video-hero .video-hero-kicker {
-  margin: 0 0 20px;
+  margin: 0 0 1.25rem;
+  padding-block-end: 0.75rem;
+  border-block-end: var(--rule);
   color: var(--brand-3);
-  font-size: var(--body-font-size-s);
-  font-weight: 700;
+  font-family: var(--mono-font-family);
+  font-size: var(--body-font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
   line-height: 1.2;
-  text-shadow: 0 10px 28px rgb(0 0 0 / 36%);
+  text-transform: uppercase;
+}
+
+.video-hero .video-hero-kicker strong {
+  font-weight: inherit;
 }
 
 .video-hero p {
-  max-width: 680px;
-  margin-top: 24px;
+  max-inline-size: 42rem;
+  margin-block-start: 1.5rem;
   color: var(--text-muted);
-  font-size: 21px;
-  line-height: 1.35;
-  text-shadow: 0 10px 28px rgb(0 0 0 / 42%);
+  font-size: var(--body-font-size-m);
+  line-height: 1.5;
+}
+
+.video-hero-content a {
+  display: inline-block;
+  margin-inline-end: 1.5rem;
+  color: var(--brand-1);
+}
+
+.video-hero-content a:hover {
+  color: var(--brand-2);
 }
 
 @media (width >= 900px) {
   .video-hero {
-    padding: 72px 32px;
-  }
-
-  .video-hero h1 {
-    font-size: 72px;
-  }
-
-  .video-hero p {
-    font-size: 24px;
-  }
-}
-
-@media (width >= 1200px) {
-  .video-hero h1 {
-    font-size: 84px;
+    padding: 4.5rem 2rem;
   }
 }
 

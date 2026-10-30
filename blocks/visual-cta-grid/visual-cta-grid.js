@@ -1,41 +1,30 @@
 /**
- * Visual CTA Grid block.
+ * Visual CTA Grid block: an index of destinations.
  *
- * Authoring contract: each row is one CTA card with a strong-tagged link
- * (the headline) followed by descriptive text.
+ * Authoring contract: each row is one entry with a strong-wrapped link
+ * (the title) followed by descriptive text.
  *
  *   <div class="visual-cta-grid">
  *     <div><div>
- *       <a href="…"><strong>Open the full explainer</strong></a>
+ *       <strong><a href="…">Open the full explainer</a></strong>
  *       View the complete interactive page…
  *     </div></div>
- *     <div><div> … another card … </div></div>
  *   </div>
+ *
+ * The decorator only classifies: authored rows, cells and links stay in
+ * place so Canvas keeps their editor identity. Numbering, rules and the
+ * trailing arrow are CSS.
  */
 export default function decorate(block) {
-  const rows = [...block.querySelectorAll(':scope > div')];
-  block.textContent = '';
-  rows.forEach((row) => {
-    const cell = row.querySelector(':scope > div') || row;
-    const card = document.createElement('a');
-    card.className = 'visual-cta-card';
-    const link = cell.querySelector('a[href]');
-    if (link) {
-      card.href = link.getAttribute('href');
-      const headline = link.querySelector('strong') || link;
-      const headlineEl = document.createElement('strong');
-      headlineEl.textContent = headline.textContent.trim();
-      card.appendChild(headlineEl);
-    }
-    // Take the remaining text — strip the link's own text from the cell text.
-    const cellClone = cell.cloneNode(true);
-    cellClone.querySelectorAll('a').forEach((a) => a.remove());
-    const desc = cellClone.textContent.trim();
-    if (desc) {
-      const span = document.createElement('span');
-      span.textContent = desc;
-      card.appendChild(span);
-    }
-    block.appendChild(card);
+  block.setAttribute('role', 'list');
+  [...block.children].forEach((row) => {
+    row.classList.add('visual-cta-item');
+    row.setAttribute('role', 'listitem');
+    const cell = row.querySelector(':scope > div');
+    cell?.classList.add('visual-cta-body');
+    const link = (cell || row).querySelector('a[href]');
+    if (!link) return;
+    link.classList.add('visual-cta-link');
+    (link.closest('strong') || link).classList.add('visual-cta-title');
   });
 }
