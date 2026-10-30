@@ -35,12 +35,12 @@ Loved media job: retired (oak-chain-splash.mp4, tree + chains, baked text)
 | `--code-bg` | `#121315` | code wells |
 | `--text-color` | `#ece6d8` ivory | body ink |
 | `--text-muted` | `rgb(236 230 216 / 72%)` | secondary ink |
-| `--text-faint` | `rgb(236 230 216 / 48%)` | captions, labels |
+| `--text-faint` | `rgb(236 230 216 / 56%)` | captions, labels (56%: 48% measured 4.2:1, below the 4.5:1 floor) |
 | `--brand-1` | `#c8a35a` brass | links, the one accent |
 | `--brand-2` | `#dcbd7c` | link hover |
 | `--brand-3` | `#e9d3a3` | kicker / highlights |
 | `--brand-soft` | `rgb(200 163 90 / 12%)` | selection, hover wash |
-| `--brand-border` | `rgb(200 163 90 / 35%)` | focus rings, active rules |
+| `--brand-border` | `rgb(200 163 90 / 35%)` | active rules (focus rings use solid `--brand-1`; 35% is too faint to see) |
 | `--border-color` | `rgb(236 230 216 / 16%)` | hairline rules |
 | `--divider-color` | `rgb(236 230 216 / 9%)` | faint dividers |
 | `--rule` (new) | `1px solid var(--border-color)` | the manual hairline |

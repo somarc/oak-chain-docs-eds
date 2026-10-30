@@ -1,31 +1,29 @@
 .mermaid {
-  margin: 1.5rem 0;
+  margin-block: 1.5rem;
 }
 
 .mermaid .mermaid-stage {
-  background: var(--background-color);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1.5rem;
   display: flex;
   justify-content: center;
+  border: var(--rule);
+  padding: 1.5rem;
+  background: var(--code-bg);
 }
 
 .mermaid .mermaid-stage svg {
-  max-width: 100%;
-  height: auto;
+  max-inline-size: 100%;
+  block-size: auto;
 }
 
 .mermaid .mermaid-error {
-  background: rgb(248 81 73 / 8%);
-  border-color: rgb(248 81 73 / 30%);
+  border-inline-start: 2px solid var(--brand-1);
   color: var(--text-muted);
 }
 
 .mermaid .mermaid-error pre {
   margin: 0;
-  background: transparent;
   border: 0;
+  background: transparent;
   font-size: var(--body-font-size-xs);
   white-space: pre-wrap;
 }
