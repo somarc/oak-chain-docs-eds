@@ -2,7 +2,9 @@
  * IBM Plex (SIL Open Font License 1.1, see /fonts/OFL.txt).
  * Latin-1 subsets from the official @ibm/plex-sans-condensed 2.0.0,
  * @ibm/plex-sans 1.1.0 and @ibm/plex-mono 2.5.0 packages.
- * Only the condensed display weight is preloaded (head.html).
+ * The condensed display weight and the body regular are preloaded (head.html).
+ * Every face is font-display: optional: a face that misses the first paint
+ * window is skipped for that view (fallback below) instead of reflowing it.
  */
 
 @font-face {
@@ -17,7 +19,7 @@
   font-family: 'IBM Plex Sans';
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional; /* never swap after paint: no font CLS on any OS */
   src: url('/fonts/IBMPlexSans-Regular-Latin1.woff2') format('woff2');
 }
 
@@ -25,7 +27,7 @@
   font-family: 'IBM Plex Sans';
   font-style: normal;
   font-weight: 600;
-  font-display: swap;
+  font-display: optional; /* never swap after paint: no font CLS on any OS */
   src: url('/fonts/IBMPlexSans-SemiBold-Latin1.woff2') format('woff2');
 }
 
@@ -33,7 +35,7 @@
   font-family: 'IBM Plex Mono';
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional; /* never swap after paint: no font CLS on any OS */
   src: url('/fonts/IBMPlexMono-Regular-Latin1.woff2') format('woff2');
 }
 
@@ -41,7 +43,7 @@
   font-family: 'IBM Plex Mono';
   font-style: normal;
   font-weight: 500;
-  font-display: swap;
+  font-display: optional; /* never swap after paint: no font CLS on any OS */
   src: url('/fonts/IBMPlexMono-Medium-Latin1.woff2') format('woff2');
 }
 
