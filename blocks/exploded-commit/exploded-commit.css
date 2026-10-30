@@ -10,10 +10,20 @@
   --ec-edge-weight: 0.7px;
   --ec-line-weight: 0.5px;
 
+  position: relative;
   display: grid;
   gap: 1.5rem;
   margin-block: 2rem;
   counter-reset: ec-layer;
+}
+
+/* width gauge for the layout observer: spans the block, never has height */
+.exploded-commit .exploded-commit-gauge {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 0;
+  pointer-events: none;
 }
 
 /* materials: each sets top, four side shades, a fill and its line inks */
@@ -174,7 +184,7 @@
   transition: transform 820ms var(--ec-ease), filter 200ms ease;
 }
 
-.exploded-commit :is(.ec-axis, .ec-leader) {
+.exploded-commit :is(.ec-axis, .ec-leader, .exploded-commit-marker) {
   transition: opacity 280ms ease 600ms;
 }
 
@@ -182,7 +192,7 @@
   transform: translateY(var(--ec-collapse));
 }
 
-.exploded-commit.is-assembled :is(.ec-axis, .ec-leader) {
+.exploded-commit.is-assembled :is(.ec-axis, .ec-leader, .exploded-commit-marker) {
   opacity: 0;
 }
 
@@ -230,6 +240,8 @@
 }
 
 .exploded-commit .exploded-commit-item {
+  --ec-push: 0px;
+
   counter-increment: ec-layer;
   padding-block: 0.75rem;
   border-block-end: var(--rule);
@@ -290,58 +302,54 @@
   }
 }
 
-/* desktop: labels sit in a column on the leaders' ends */
-@media (width >= 900px) {
-  .exploded-commit.has-figure {
-    grid-template-columns: minmax(0, 30rem) minmax(15rem, 1fr);
-    gap: 0;
-    align-items: stretch;
-  }
+/*
+ * Columned (set by the block script from 900px when the labels fit): labels sit
+ * on the leaders' ends, each pushed down by --ec-push to clear the one above.
+ */
+.exploded-commit.is-columned {
+  grid-template-columns: minmax(0, 30rem) minmax(15rem, 1fr);
+  gap: 0;
+  align-items: stretch;
+}
 
-  .exploded-commit.has-figure .exploded-commit-figure {
-    max-inline-size: none;
-    margin-inline: 0;
-  }
+.exploded-commit.is-columned .exploded-commit-figure {
+  max-inline-size: none;
+  margin-inline: 0;
+}
 
-  .exploded-commit.has-figure .exploded-commit-marker {
-    display: none;
-  }
+.exploded-commit.is-columned .exploded-commit-marker {
+  display: none;
+}
 
-  /* the leaders run on past the figure's edge to the labels */
-  .exploded-commit.has-figure .ec-svg {
-    overflow: visible;
-  }
+/* the leaders run on past the figure's edge to the labels */
+.exploded-commit.is-columned .ec-svg {
+  overflow: visible;
+}
 
-  .exploded-commit.has-figure .exploded-commit-list {
-    position: relative;
-    display: block;
-    border-block-start: 0;
-  }
+.exploded-commit.is-columned .exploded-commit-list {
+  position: relative;
+  display: block;
+  border-block-start: 0;
+}
 
-  .exploded-commit.has-figure .exploded-commit-item:not(.is-extra) {
-    position: absolute;
-    inset-block-start: var(--ec-anchor);
-    inset-inline: 0;
-    padding-block: 0;
-    padding-inline-start: 2.25rem;
-    border-block-end: 0;
-    transform: translateY(calc(var(--label-font-size) * -0.65));
-  }
-
-  .exploded-commit.has-figure .exploded-commit-item.is-extra {
-    position: relative;
-    inset-block-start: 100%;
-  }
+.exploded-commit.is-columned .exploded-commit-item {
+  position: absolute;
+  inset-block-start: calc(var(--ec-anchor) + var(--ec-push));
+  inset-inline: 0;
+  padding-block: 0;
+  padding-inline-start: 2.25rem;
+  border-block-end: 0;
+  transform: translateY(calc(var(--label-font-size) * -0.65));
 }
 
 @media (width >= 1200px) {
-  .exploded-commit.has-figure {
+  .exploded-commit.is-columned {
     grid-template-columns: minmax(0, 34rem) minmax(18rem, 1fr);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .exploded-commit :is(.ec-layer, .ec-axis, .ec-leader, .exploded-commit-label) {
+  .exploded-commit :is(.ec-layer, .ec-axis, .ec-leader, .exploded-commit-marker, .exploded-commit-label) {
     transition: none;
   }
 }

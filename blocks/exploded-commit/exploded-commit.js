@@ -22,6 +22,11 @@
  * into the list (never rebuilt), so DA Canvas keeps editing them; rows past
  * the fifth stay in the list after the five layers.
  *
+ * From 900px the labels sit on their leaders beside the figure; a label that
+ * would collide with the one above is pushed down and its leader bends to
+ * follow. If the pushed labels no longer fit the figure's height (or there are
+ * extra rows), the block keeps the stacked layout: figure, then the list.
+ *
  * The figure is decorative (aria-hidden); the ordered list is the content.
  * In DA Canvas (html[quick-edit]) and under prefers-reduced-motion the figure
  * renders exploded and still, and in Canvas no interaction is wired.
@@ -95,6 +100,95 @@ function wireHighlight(block) {
   });
 }
 
+const WIDE = '(width >= 900px)';
+const LABEL_GAP = 10; // px between one label's bottom and the next label's top
+const ELBOW_STEP = 7; // viewBox units between neighbouring elbows, upper leaders furthest out
+
+/** Redraw a leader as a straight run, or with an elbow when its label was pushed down. */
+function drawLeader(path, index, push, svg) {
+  const [ax, ay, end] = (path.dataset.base || '').split(' ').map(Number);
+  if (!Number.isFinite(end)) return;
+  if (push < 0.5) {
+    path.setAttribute('d', `M${ax} ${ay}H${end}`);
+    return;
+  }
+  const { width } = svg.getBoundingClientRect();
+  const [, , viewWidth] = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+  const drop = (push * viewWidth) / width;
+  const elbow = Math.max(ax + 2, viewWidth - 6 - ELBOW_STEP * index);
+  path.setAttribute('d', `M${ax} ${ay}H${elbow.toFixed(1)}V${(ay + drop).toFixed(1)}H${end}`);
+}
+
+/**
+ * Desktop labels sit on their leaders. Walk them top to bottom, push each one
+ * clear of the one above, and bend its leader to follow. When the pushed column
+ * no longer fits beside the figure, the block falls back to the stacked layout.
+ */
+function layoutLabels(block, figure, list, svg) {
+  const items = [...list.children];
+  const leaders = items.map((item) => svg.querySelector(`[data-layer="${item.dataset.layer}"] .ec-leader path`));
+  items.forEach((item, index) => {
+    item.style.setProperty('--ec-push', '0px');
+    if (leaders[index]) drawLeader(leaders[index], index, 0, svg);
+  });
+  const columned = window.matchMedia(WIDE).matches && !items.some((item) => item.classList.contains('is-extra'));
+  block.classList.toggle('is-columned', columned);
+  if (!columned) return;
+
+  const box = list.getBoundingClientRect();
+  const limit = figure.getBoundingClientRect().height;
+  let floor = -Infinity;
+  const pushes = items.map((item) => {
+    const rect = item.getBoundingClientRect();
+    const top = rect.top - box.top;
+    const push = Math.max(0, floor + LABEL_GAP - top);
+    floor = top + push + rect.height;
+    return push;
+  });
+  if (floor > limit) {
+    block.classList.remove('is-columned');
+    return;
+  }
+  items.forEach((item, index) => {
+    item.style.setProperty('--ec-push', `${pushes[index].toFixed(1)}px`);
+    if (leaders[index]) drawLeader(leaders[index], index, pushes[index], svg);
+  });
+}
+
+/**
+ * Lay the labels out now and again whenever the block's width changes or the
+ * web fonts arrive. A zero-height gauge tracks the width, so the class and
+ * offsets written here never resize what is observed (no observer loop).
+ */
+function watchLayout(block, figure, list, svg) {
+  svg.querySelectorAll('.ec-leader path').forEach((path) => {
+    const [, ax, ay, end] = (path.getAttribute('d') || '').match(/^M([\d.-]+) ([\d.-]+)H([\d.-]+)$/) || [];
+    if (end) path.dataset.base = `${ax} ${ay} ${end}`;
+  });
+  const gauge = document.createElement('div');
+  gauge.className = 'exploded-commit-gauge';
+  gauge.setAttribute('aria-hidden', 'true');
+  block.append(gauge);
+
+  const controller = new AbortController();
+  let width = 0;
+  const observer = new ResizeObserver(([entry]) => {
+    if (!block.isConnected) {
+      controller.abort();
+      return;
+    }
+    const next = Math.round(entry.contentRect.width);
+    if (!next || next === width) return;
+    width = next;
+    layoutLabels(block, figure, list, svg);
+  });
+  controller.signal.addEventListener('abort', () => observer.disconnect(), { once: true });
+  observer.observe(gauge);
+  document.fonts?.ready.then(() => {
+    if (!controller.signal.aborted && block.isConnected) layoutLabels(block, figure, list, svg);
+  });
+}
+
 /** Ease the layers apart once, the first time the figure is seen. */
 function explodeOnView(block, figure) {
   block.classList.add('is-assembled');
@@ -152,6 +246,7 @@ export default async function decorate(block) {
   }
 
   block.replaceChildren(figure, list);
+  if (svg) watchLayout(block, figure, list, svg);
 
   if (authoring || !svg) return;
   wireHighlight(block);
