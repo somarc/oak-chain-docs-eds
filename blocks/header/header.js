@@ -24,7 +24,8 @@ function setMenuExpanded(nav, expanded) {
   nav.dataset.expanded = String(expanded);
   button.setAttribute('aria-expanded', String(expanded));
   button.setAttribute('aria-label', expanded ? 'Close navigation' : 'Open navigation');
-  document.body.style.overflowY = (!expanded && !isDesktop.matches) ? 'hidden' : '';
+  // lock page scroll only while the mobile menu is open
+  document.body.style.overflowY = (expanded && !isDesktop.matches) ? 'hidden' : '';
   if (!isDesktop.matches && !expanded) closeDropdowns(navSections);
 }
 
