@@ -144,7 +144,7 @@ const CARRIER = {
 // they are quiet silhouettes behind and left of this cluster (the leaders own the right side).
 // Offsets are world units from this carrier's centre, listed back to front for painting.
 const NEIGHBOURS = [
-  { dx: -118, dy: -118, tiles: 5 },
+  { dx: -120, dy: -116, tiles: 3 },
   { dx: -62, dy: -58, tiles: 3 },
 ];
 
