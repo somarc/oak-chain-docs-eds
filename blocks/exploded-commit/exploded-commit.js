@@ -13,11 +13,12 @@
  *   | Document        | The JCR node you wrote                   |
  *   | Signature       | Sealed by your wallet                    |
  *   | Settlement      | Paid on Ethereum (sepolia mode)          |
- *   | Ordering        | Sequenced by a three-validator cluster   |
- *   | Storage         | Applied by each validator to its own Oak TAR segments |
+ *   | Ordering        | Ordered by your own validator cluster    |
+ *   | Storage         | Applied on every validator in that cluster |
  *
  * Rows map to layers by position: 1 document card, 2 signature plate,
- * 3 settlement coin, 4 validator tiles, 5 segment slab. A missing row or cell
+ * 3 settlement coin, 4 validator tiles (this cluster, with neighbouring
+ * enterprises' clusters as silhouettes behind it), 5 segment slab. A missing row or cell
  * falls back to the default above. Authored rows and cells are moved intact
  * into the list (never rebuilt), so DA Canvas keeps editing them; rows past
  * the fifth stay in the list after the five layers.
@@ -37,8 +38,8 @@ const DEFAULTS = [
   ['Document', 'The JCR node you wrote'],
   ['Signature', 'Sealed by your wallet'],
   ['Settlement', 'Paid on Ethereum (sepolia mode)'],
-  ['Ordering', 'Sequenced by a three-validator cluster'],
-  ['Storage', 'Applied by each validator to its own Oak TAR segments'],
+  ['Ordering', 'Ordered by your own validator cluster'],
+  ['Storage', 'Applied on every validator in that cluster'],
 ];
 
 const FIGURE_URL = new URL('./exploded-commit.svg', import.meta.url);

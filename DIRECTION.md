@@ -63,7 +63,7 @@ No gradients, no glows, no grid-paper background. One accent: brass.
 
 ### The custom object
 
-`exploded-commit` block: an isometric exploded view of one write, top to bottom: document card (the JCR node), signature plate (wallet seal), faceted coin (settlement), three validator tiles (ordering), striped segment slab (Oak TAR storage). Leader lines to authored HTML labels. Hover/focus a layer highlights it and its label. Static when `prefers-reduced-motion` or `html[quick-edit]`. The H1 stays the LCP; the figure decorates after.
+`exploded-commit` block: an isometric exploded view of one write, top to bottom: document card (the JCR node), signature plate (wallet seal), faceted coin (settlement), three validator tiles (ordering: this enterprise's cluster, with neighbouring enterprises' clusters as page-colour silhouettes behind it, faded in with the leaders), striped segment slab (Oak TAR storage). Leader lines to authored HTML labels. Hover/focus a layer highlights it and its label. Static when `prefers-reduced-motion` or `html[quick-edit]`. The H1 stays the LCP; the figure decorates after.
 
 ## Ownership while building (parallel builders, disjoint files)
 
