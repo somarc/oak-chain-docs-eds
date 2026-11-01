@@ -109,8 +109,8 @@
 
   <rect class="box" x="1320" y="640" width="220" height="120" fill="#ffec99" stroke="#f08c00"/>
   <text x="1430" y="680" text-anchor="middle" class="label">IPFS Binary Layer</text>
-  <text x="1430" y="702" text-anchor="middle" class="sublabel">content-addressed payloads</text>
-  <text x="1430" y="722" text-anchor="middle" class="sublabel">validators hold CIDs only</text>
+  <text x="1430" y="702" text-anchor="middle" class="sublabel">validator IPFS nodes hold bytes</text>
+  <text x="1430" y="722" text-anchor="middle" class="sublabel">consensus carries blob ID + CID</text>
 
   <rect x="30" y="830" width="1540" height="250" class="lane"/>
   <text x="50" y="856" class="lane-title">Lane D: Separation of Concerns, Boundaries, and Operational Signals</text>

@@ -1390,7 +1390,7 @@
           </div>
           <div class="fact">
             <h3>Remote mounts stay outside quorum</h3>
-            <p>Foreign shard content is exposed through <span class="mono">LazyHttpNodeStore</span> (the implementation surface for the canonical <span class="mono">oak-segment-gossip</span> protocol) and never becomes part of local consensus state.</p>
+            <p>Foreign shard content is exposed through <span class="mono">LazyHttpNodeStore</span> read-only mounts and never becomes part of local consensus state.</p>
           </div>
           <div class="fact">
             <h3>Authority is prefix-scoped</h3>
