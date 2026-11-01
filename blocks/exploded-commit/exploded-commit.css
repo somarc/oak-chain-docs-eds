@@ -184,7 +184,7 @@
   transition: transform 820ms var(--ec-ease), filter 200ms ease;
 }
 
-.exploded-commit :is(.ec-axis, .ec-leader, .exploded-commit-marker) {
+.exploded-commit :is(.ec-axis, .ec-leader, .ec-neighbours, .exploded-commit-marker) {
   transition: opacity 280ms ease 600ms;
 }
 
@@ -192,7 +192,7 @@
   transform: translateY(var(--ec-collapse));
 }
 
-.exploded-commit.is-assembled :is(.ec-axis, .ec-leader, .exploded-commit-marker) {
+.exploded-commit.is-assembled :is(.ec-axis, .ec-leader, .ec-neighbours, .exploded-commit-marker) {
   opacity: 0;
 }
 
@@ -213,6 +213,16 @@
 .exploded-commit .ec-layer.is-active .ec-leader path,
 .exploded-commit .ec-layer.is-active .ec-anchor {
   stroke: var(--brand-1);
+}
+
+/* neighbouring enterprises' clusters: page-colour silhouettes in the leader tone, never highlighted */
+.exploded-commit .ec-neighbours .iso-fill {
+  fill: var(--background-color);
+}
+
+.exploded-commit .ec-layer .ec-neighbours .iso-solid .iso-edge {
+  stroke: var(--ec-leader);
+  stroke-width: var(--ec-line-weight);
 }
 
 /* markers: the leader ends on a number on narrow screens */
@@ -353,7 +363,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .exploded-commit :is(.ec-layer, .ec-axis, .ec-leader, .exploded-commit-marker, .exploded-commit-label) {
+  .exploded-commit :is(.ec-layer, .ec-axis, .ec-leader, .ec-neighbours, .exploded-commit-marker, .exploded-commit-label) {
     transition: none;
   }
 }

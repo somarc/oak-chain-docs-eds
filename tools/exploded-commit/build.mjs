@@ -14,6 +14,8 @@
  * site tokens. Layers are <g data-layer="1..5"> (1 = top), painted 5 → 1.
  * The root carries data-anchors: the screen y of each layer's leader where it
  * meets the right edge of the viewBox, so the block can place its HTML labels.
+ * Layer 4 also draws neighbouring enterprises' clusters as silhouettes in
+ * <g class="ec-neighbours">; they widen the viewBox but not the label layout.
  */
 import { writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -138,6 +140,37 @@ const CARRIER = {
   x: -76, y: -29, w: 152, d: 58, r: 4,
 };
 
+// Other enterprises' clusters on the same plane. They order their own writes, not this one, so
+// they are quiet silhouettes behind and left of this cluster (the leaders own the right side).
+// Offsets are world units from this carrier's centre, listed back to front for painting.
+const NEIGHBOURS = [
+  { dx: -120, dy: -116, tiles: 3 },
+  { dx: -62, dy: -58, tiles: 3 },
+];
+
+const carrierFor = (tiles, cx = 0, cy = 0) => {
+  const w = tiles * TILE_W + (tiles - 1) * TILE_GAP + 12;
+  return {
+    x: cx - w / 2, y: cy - CARRIER.d / 2, w, d: CARRIER.d, r: CARRIER.r,
+  };
+};
+
+function neighbours(P, z0, zt, top) {
+  const extent = [];
+  const svg = NEIGHBOURS.map(({ dx, dy, tiles }) => {
+    const carrier = carrierFor(tiles, dx, dy);
+    extent.push(...k.boxCorners(carrier, z0, top));
+    let body = k.solidSvg(k.slabOf(carrier, z0, zt - z0, P, 6, 0.6), { flat: true, tone: 'faint' });
+    Array.from({ length: tiles }, (_, i) => ({
+      x: carrier.x + 6 + i * (TILE_W + TILE_GAP), y: dy - TILE_D / 2, w: TILE_W, d: TILE_D, r: 3,
+    })).forEach((t) => {
+      body += k.solidSvg(k.slabOf(t, zt, TILE_H, P, 4, 0.8), { flat: true, tone: 'faint' });
+    });
+    return body;
+  }).join('');
+  return { svg: `<g class="ec-neighbours">${svg}</g>`, extent };
+}
+
 function ordering(P, z0) {
   const {
     solid, line, dots, screw, group,
@@ -145,6 +178,7 @@ function ordering(P, z0) {
   const carrierH = 3;
   const zt = z0 + carrierH;
   const top = zt + TILE_H;
+  const others = neighbours(P, z0, zt, top);
   let steel = solid(k.slabOf(CARRIER, z0, carrierH, P, 6, 0.6), 'steel', { tone: 'mid' });
   steel += [[CARRIER.x + 3, 0], [CARRIER.x + CARRIER.w - 3, 0]].map(([x, y]) => screw(x, y, zt, 1.1)).join('');
   const tiles = [0, 1, 2].map((i) => ({
@@ -201,7 +235,14 @@ function ordering(P, z0) {
   ];
   const last = tiles[2];
   return {
-    svg: group('steel', steel + bars), outline, top, topPlan: CARRIER, axis: [0, 0, top + 1.6], base: z0, anchorAt: [last.x + last.w, last.y, top],
+    svg: others.svg + group('steel', steel + bars),
+    outline,
+    extent: others.extent,
+    top,
+    topPlan: CARRIER,
+    axis: [0, 0, top + 1.6],
+    base: z0,
+    anchorAt: [last.x + last.w, last.y, top],
   };
 }
 
@@ -375,7 +416,12 @@ function layout(P) {
       }) && (!placed.length || clearOf(placed[placed.length - 1], poly, anchor));
       if (clear) {
         placed.push({
-          ...layer, poly, anchor, centre: k.iso(layer.axis, P),
+          ...layer,
+          poly,
+          anchor,
+          centre: k.iso(layer.axis, P),
+          // drawn but outside the label layout: it widens the viewBox only
+          reach: layer.extent ? hull(layer.extent, P) : [],
         });
         z = layer.top;
         break;
@@ -388,7 +434,7 @@ function layout(P) {
 
 // First pass at a unit origin to measure, then shift into the viewBox.
 const measured = layout(unit);
-const allPts = measured.flatMap((l) => l.poly);
+const allPts = measured.flatMap((l) => [...l.poly, ...l.reach]);
 const minX = Math.min(...allPts.map((p) => p[0]));
 const maxX = Math.max(...allPts.map((p) => p[0]));
 const minY = Math.min(...allPts.map((p) => p[1]));
