@@ -72,10 +72,10 @@ const FLOWS = {
       ['validators1', 'VALIDATOR', 280, 80, 'Validators', 'Raft consensus cluster'],
       ['ethereum1', 'ETHEREUM', 480, 80, 'Ethereum', 'Payment & verification'],
       ['label1', 'CONTENT', 680, 80, 'Model 1', 'Blockchain-Native (new apps)', 20],
-      ['aem', 'AEM', 70, 260, 'Existing AEM', 'On-prem or AMS (target)'],
+      ['aem', 'AEM', 70, 260, 'AEM 6.5 LTS', 'Read-only /oak-chain mount'],
       ['http', 'CONSENSUS', 280, 260, 'HTTP mount', 'HTTP segment transfer'],
       ['validators2', 'VALIDATOR', 480, 260, 'Validators', 'Same cluster, different access'],
-      ['label2', 'CONTENT', 680, 260, 'Model 2', 'AEM Integration (existing)', 20],
+      ['label2', 'CONTENT', 680, 260, 'Model 2', 'AEM 6.5 LTS (read-only)', 20],
       ['ipfs', 'IPFS', 280, 170, 'IPFS', 'Validator node, or author node by CID; consensus stores the blob ID and CID'],
     ],
     edges: [
@@ -97,7 +97,7 @@ const FLOWS = {
   },
   'aem-integration': {
     nodes: [
-      ['aem', 'AEM', 70, 180, 'Existing AEM', 'On-prem or AMS (target)'],
+      ['aem', 'AEM', 70, 180, 'AEM 6.5 LTS', 'Read-only /oak-chain mount'],
       ['composite', 'OAK_STORE', 220, 180, 'Composite Mount', 'Oak CompositeNodeStore'],
       ['local', 'SEGMENT', 220, 80, '/content (local)', 'Read-write local content'],
       ['http', 'CONSENSUS', 400, 180, 'HTTP mount', 'HTTP persistence layer'],
@@ -124,7 +124,7 @@ const FLOWS = {
   },
   write: {
     nodes: [
-      ['author', 'AUTHOR', 70, 200, 'Author', 'Content editor (AEM Connector or SDK)'],
+      ['author', 'AUTHOR', 70, 200, 'Author', 'Content editor (validator API or SDK)'],
       ['wallet', 'WALLET', 200, 100, 'Author Wallet', 'Signs content with secp256k1 key'],
       ['proposal', 'SIGNATURE', 200, 300, 'Write Proposal', 'Signed content change request'],
       ['leader', 'VALIDATOR', 380, 200, 'Raft Leader', 'Receives and validates proposals'],
@@ -236,7 +236,7 @@ const FLOWS = {
   },
   architecture: {
     nodes: [
-      ['sling', 'AUTHOR', 110, 70, 'Author', 'AEM Connector or Oak Chain SDK'],
+      ['sling', 'AUTHOR', 110, 70, 'Author', 'Validator API or Oak Chain SDK'],
       ['ethereum', 'ETHEREUM', 470, 70, 'Ethereum', 'Settlement event in local or sepolia mode; not yet validated'],
       ['metamask', 'WALLET', 650, 70, 'MetaMask', 'Wallet for signing & payment'],
       ['validator2', 'VALIDATOR', 110, 310, 'Validator 2', 'Raft consensus node (Follower)'],
