@@ -6,6 +6,8 @@
 
 **2026-10-30, owner decisions:** first, code changes may merge to `main` (which updates live code). Later the same day, after the docs audit, consolidation (29 to 21 pages) and the technical-manual redesign were reviewed on preview, the owner approved publishing the amended content to live, rebuilding the index and sitemap, and unpublishing the retired and orphan routes.
 
+**2026-11-02, owner approvals:** publish the rewritten `/guide/aem-integration` as the official AEM 6.5 LTS path (read-only `/oak-chain` mount from `oak-chain-connector/mount`), then its validator-GC and maintenance update; publish the matching AEM corrections on `/faq`, `/how-it-works`, `/architecture`, `/guide/consensus`, `/guide/content-consumption`, `/status`, `/`, `/guide/`, `/thesis` and `/nav`; and correct the flow-graph labels that named the AEM Connector as a write path.
+
 The x402 evidence list below no longer gates publication; it remains the bar for any page that claims paid actions over HTTP 402 are implemented. `/status` is where demonstrated versus not-yet-validated work is stated.
 
 **Recorded drift:** on 2026-10-24 between 14:55 and 14:57 GMT, 16 pages and `/nav` were republished to live while this gate was closed (admin status `live.lastModified`). Their live content is identical to preview; the operator is unknown.
